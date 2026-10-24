@@ -1,0 +1,530 @@
+{
+  "metadata": {
+    "run_id": "2026-10-15-test-99",
+    "created": "2026-10-15",
+    "notes": "Extracted from PRD: Add to Cart (Multi-Type) PRD-COM-014 v0.1 with full coverage for all requirements and NFRs."
+  },
+  "inputs": [
+    {
+      "source": "output/2026-10-15-test-99/attachments/confluence-1081346-PRD-Add-to-Cart-Multi-Type.md",
+      "input_type": "PRD",
+      "secondary_types": [
+        "USER_STORY",
+        "ACCEPTANCE_CRITERIA"
+      ],
+      "confidence": "high",
+      "evidence": [
+        "Document ID | PRD-COM-014",
+        "PRD: Add to Cart (Multi-Type)",
+        "US-1 through US-10",
+        "FR-1 through FR-17",
+        "NFR-1 through NFR-7"
+      ]
+    }
+  ],
+  "features": [
+    {
+      "code": "CART-CORE",
+      "name": "Cart Core & General Behavior",
+      "source_ref": "PRD-COM-014 §5, §8, §9, §10",
+      "description": "General cart behaviors including product page add, quantity aggregation, cart page display, revalidation, cart limits, multi-client sync, mini-cart confirmations, performance, availability, security, accessibility, and localization."
+    },
+    {
+      "code": "CART-PROT",
+      "name": "Buyer Protection",
+      "source_ref": "PRD-COM-014 §5, §8",
+      "description": "Buyer Protection fee display and calculation."
+    },
+    {
+      "code": "CART-LUX",
+      "name": "Luxury Listings",
+      "source_ref": "PRD-COM-014 §5, §8, §9",
+      "description": "Luxury listing state checks, fixed quantity 1, 15-minute stock reservations, and expiration banners."
+    },
+    {
+      "code": "CART-OM",
+      "name": "Offer Mode (OM)",
+      "source_ref": "PRD-COM-014 §5, §8, §9, §10",
+      "description": "Offer mode accepted unexpired offer addition, price locking, countdown timers, expiration handling, and privacy controls."
+    },
+    {
+      "code": "CART-BULK",
+      "name": "Bulk Listings",
+      "source_ref": "PRD-COM-014 §5, §8, §9",
+      "description": "Business account validation, MOQ enforcement, tier pricing recalculation, and next-tier saving hints."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "FR-1",
+      "feature": "CART-CORE",
+      "text": "Add to Cart button on product page for Live listings; hidden for Draft, Pending Review, Paused, Closed",
+      "source_ref": "PRD-COM-014 §8 FR-1",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "FR-2",
+      "feature": "CART-CORE",
+      "text": "Server validates listing state, stock and buyer eligibility on every add",
+      "source_ref": "PRD-COM-014 §8 FR-2",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "FR-3",
+      "feature": "CART-CORE",
+      "text": "Adding the same listing again increases quantity instead of creating a new line",
+      "source_ref": "PRD-COM-014 §8 FR-3",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "FR-4",
+      "feature": "CART-CORE",
+      "text": "Cart shows line items, type badge, unit price, quantity, line total, fees and grand total",
+      "source_ref": "PRD-COM-014 §8 FR-4",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "FR-5",
+      "feature": "CART-CORE",
+      "text": "Buyer can change quantity or remove a line; totals update within 1 s",
+      "source_ref": "PRD-COM-014 §8 FR-5",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "FR-6",
+      "feature": "CART-PROT",
+      "text": "Protection fee shown as its own line on the cart and product page",
+      "source_ref": "PRD-COM-014 §8 FR-6",
+      "origin": "stated",
+      "user_role": "Cautious buyer"
+    },
+    {
+      "id": "FR-7",
+      "feature": "CART-LUX",
+      "text": "Quantity fixed at 1; 15-minute reservation starts on add",
+      "source_ref": "PRD-COM-014 §8 FR-7",
+      "origin": "stated",
+      "user_role": "Luxury buyer"
+    },
+    {
+      "id": "FR-8",
+      "feature": "CART-LUX",
+      "text": "Reservation expiry removes the hold and shows a banner in the cart",
+      "source_ref": "PRD-COM-014 §8 FR-8",
+      "origin": "stated",
+      "user_role": "Luxury buyer"
+    },
+    {
+      "id": "FR-9",
+      "feature": "CART-OM",
+      "text": "Add to Cart only from an accepted, unexpired offer; price locked to the offer",
+      "source_ref": "PRD-COM-014 §8 FR-9",
+      "origin": "stated",
+      "user_role": "Negotiating buyer"
+    },
+    {
+      "id": "FR-10",
+      "feature": "CART-OM",
+      "text": "Cart shows offer expiry countdown; expired offer lines cannot go to checkout",
+      "source_ref": "PRD-COM-014 §8 FR-10",
+      "origin": "stated",
+      "user_role": "Negotiating buyer"
+    },
+    {
+      "id": "FR-11",
+      "feature": "CART-BULK",
+      "text": "Add requires business account; quantity >= MOQ",
+      "source_ref": "PRD-COM-014 §8 FR-11",
+      "origin": "stated",
+      "user_role": "Business buyer"
+    },
+    {
+      "id": "FR-12",
+      "feature": "CART-BULK",
+      "text": "Unit price recalculated from tier on every quantity change",
+      "source_ref": "PRD-COM-014 §8 FR-12",
+      "origin": "stated",
+      "user_role": "Business buyer"
+    },
+    {
+      "id": "FR-13",
+      "feature": "CART-BULK",
+      "text": "Next-tier saving hint",
+      "source_ref": "PRD-COM-014 §8 FR-13",
+      "origin": "stated",
+      "user_role": "Business buyer"
+    },
+    {
+      "id": "FR-14",
+      "feature": "CART-CORE",
+      "text": "Cart revalidates price and stock when opened and when checkout starts",
+      "source_ref": "PRD-COM-014 §8 FR-14",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "FR-15",
+      "feature": "CART-CORE",
+      "text": "Max 50 lines per cart",
+      "source_ref": "PRD-COM-014 §8 FR-15",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "FR-16",
+      "feature": "CART-CORE",
+      "text": "Cart synced across web, Android and iOS for the same account",
+      "source_ref": "PRD-COM-014 §8 FR-16",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "FR-17",
+      "feature": "CART-CORE",
+      "text": "Mini-cart confirmation (toast) after add with View cart action",
+      "source_ref": "PRD-COM-014 §8 FR-17",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "US-1",
+      "feature": "CART-CORE",
+      "text": "As a buyer, I want to add an item to my cart from the product page so that I can buy several items together.",
+      "source_ref": "PRD-COM-014 §6 US-1",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "US-2",
+      "feature": "CART-CORE",
+      "text": "As a buyer, I want to see each item's type badge and any fees in the cart so that the total has no surprises.",
+      "source_ref": "PRD-COM-014 §6 US-2",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "US-3",
+      "feature": "CART-PROT",
+      "text": "As a cautious buyer, I want the Buyer Protection fee shown before checkout so that I know what I pay.",
+      "source_ref": "PRD-COM-014 §6 US-3",
+      "origin": "stated",
+      "user_role": "Cautious buyer"
+    },
+    {
+      "id": "US-4",
+      "feature": "CART-LUX",
+      "text": "As a luxury buyer, I want my item held for me for 15 minutes so that nobody else buys it while I pay.",
+      "source_ref": "PRD-COM-014 §6 US-4",
+      "origin": "stated",
+      "user_role": "Luxury buyer"
+    },
+    {
+      "id": "US-5",
+      "feature": "CART-OM",
+      "text": "As a negotiating buyer, I want to add my accepted offer to the cart at the agreed price so that I can check out.",
+      "source_ref": "PRD-COM-014 §6 US-5",
+      "origin": "stated",
+      "user_role": "Negotiating buyer"
+    },
+    {
+      "id": "US-6",
+      "feature": "CART-BULK",
+      "text": "As a business buyer, I want the tier price to update as I change quantity so that I can pick the best quantity.",
+      "source_ref": "PRD-COM-014 §6 US-6",
+      "origin": "stated",
+      "user_role": "Business buyer"
+    },
+    {
+      "id": "US-7",
+      "feature": "CART-CORE",
+      "text": "As a buyer, I want to be told when a price or stock changes in my cart so that checkout does not fail.",
+      "source_ref": "PRD-COM-014 §6 US-7",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "US-8",
+      "feature": "CART-CORE",
+      "text": "As a buyer, I want to change quantity or remove items from the cart.",
+      "source_ref": "PRD-COM-014 §6 US-8",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "US-9",
+      "feature": "CART-BULK",
+      "text": "As a business buyer, I want a hint like 'Add 20 more to save ₹15 per unit'.",
+      "source_ref": "PRD-COM-014 §6 US-9",
+      "origin": "stated",
+      "user_role": "Business buyer"
+    },
+    {
+      "id": "US-10",
+      "feature": "CART-CORE",
+      "text": "As a buyer, I want my cart to be the same on web and app.",
+      "source_ref": "PRD-COM-014 §6 US-10",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "NFR-1",
+      "feature": "CART-CORE",
+      "text": "Add to Cart API < 300 ms at p95; cart page loads in < 1.5 s at p95 on 4G",
+      "source_ref": "PRD-COM-014 §10 NFR-1",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "NFR-2",
+      "feature": "CART-CORE",
+      "text": "99.95% for cart APIs; cart reads degrade to cached data if Listing service is down",
+      "source_ref": "PRD-COM-014 §10 NFR-2",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "NFR-3",
+      "feature": "CART-CORE",
+      "text": "Reservations are atomic; one unit is never reserved by two buyers",
+      "source_ref": "PRD-COM-014 §10 NFR-3",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "NFR-4",
+      "feature": "CART-CORE",
+      "text": "Cart APIs require auth; buyers can only read and change their own cart",
+      "source_ref": "PRD-COM-014 §10 NFR-4",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "NFR-5",
+      "feature": "CART-OM",
+      "text": "OM minimum offer and seller payout amounts never appear in cart responses",
+      "source_ref": "PRD-COM-014 §10 NFR-5",
+      "origin": "stated",
+      "user_role": "Negotiating buyer"
+    },
+    {
+      "id": "NFR-6",
+      "feature": "CART-CORE",
+      "text": "WCAG 2.1 AA; timers announced to screen readers once per minute",
+      "source_ref": "PRD-COM-014 §10 NFR-6",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    },
+    {
+      "id": "NFR-7",
+      "feature": "CART-CORE",
+      "text": "English and Hindi; ₹ formatting with Indian digit grouping",
+      "source_ref": "PRD-COM-014 §10 NFR-7",
+      "origin": "stated",
+      "user_role": "Everyday buyer"
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "requirement_id": "FR-1",
+      "text": "Button absent on a Pending Review Luxury listing, including via deep link",
+      "source_ref": "PRD-COM-014 §8 FR-1 AC",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-03",
+      "requirement_id": "FR-3",
+      "text": "One line per listing ID",
+      "source_ref": "PRD-COM-014 §8 FR-3 AC",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-05",
+      "requirement_id": "FR-7",
+      "text": "Second buyer sees 'Reserved, check back soon' during reservation",
+      "source_ref": "PRD-COM-014 §8 FR-7 AC",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-06",
+      "requirement_id": "FR-9",
+      "text": "Product page Add to Cart is hidden for OM; offer screen shows it",
+      "source_ref": "PRD-COM-014 §8 FR-9 AC",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-08",
+      "requirement_id": "FR-11",
+      "text": "Non-business buyer sees reason and link to upgrade",
+      "source_ref": "PRD-COM-014 §8 FR-11 AC",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-09",
+      "requirement_id": "FR-6",
+      "text": "Fee equals Listing service value; included in grand total",
+      "source_ref": "PRD-COM-014 §8 FR-6 AC",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-FR2-1",
+      "requirement_id": "FR-2",
+      "text": "API returns 409 with reason when any check fails; cart unchanged",
+      "source_ref": "PRD-COM-014 §8 FR-2",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-FR4-1",
+      "requirement_id": "FR-4",
+      "text": "Totals match server calculation to the paisa",
+      "source_ref": "PRD-COM-014 §8 FR-4",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-FR5-1",
+      "requirement_id": "FR-5",
+      "text": "Quantity limits per type enforced in UI and API",
+      "source_ref": "PRD-COM-014 §8 FR-5",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-FR8-1",
+      "requirement_id": "FR-8",
+      "text": "After 15 min the item is still in the cart but marked 'No longer reserved'",
+      "source_ref": "PRD-COM-014 §8 FR-8",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-FR10-1",
+      "requirement_id": "FR-10",
+      "text": "Expired line is disabled with 'Offer expired'",
+      "source_ref": "PRD-COM-014 §8 FR-10",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-FR12-1",
+      "requirement_id": "FR-12",
+      "text": "Price matches tier table for boundary quantities (MOQ, each tier start)",
+      "source_ref": "PRD-COM-014 §8 FR-12",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-FR13-1",
+      "requirement_id": "FR-13",
+      "text": "Hint hidden when already on the highest tier",
+      "source_ref": "PRD-COM-014 §8 FR-13",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-FR14-1",
+      "requirement_id": "FR-14",
+      "text": "Changed lines highlighted with old and new value",
+      "source_ref": "PRD-COM-014 §8 FR-14",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-FR15-1",
+      "requirement_id": "FR-15",
+      "text": "51st add returns CART_FULL with message",
+      "source_ref": "PRD-COM-014 §8 FR-15",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-FR16-1",
+      "requirement_id": "FR-16",
+      "text": "Item added on web appears on app after refresh",
+      "source_ref": "PRD-COM-014 §8 FR-16",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-FR17-1",
+      "requirement_id": "FR-17",
+      "text": "Toast shows item name and new cart count",
+      "source_ref": "PRD-COM-014 §8 FR-17",
+      "origin": "stated"
+    }
+  ],
+  "business_rules": [
+    {
+      "id": "BR-01",
+      "requirement_id": "FR-1",
+      "text": "Add to Cart is only permitted for Live listings and restricted for Draft, Pending Review, Paused, or Closed states.",
+      "source_ref": "PRD-COM-014 §5, §8 FR-1",
+      "origin": "stated"
+    },
+    {
+      "id": "BR-02",
+      "requirement_id": "FR-15",
+      "text": "Maximum 50 line items per cart.",
+      "source_ref": "PRD-COM-014 §4 C1, §8 FR-15",
+      "origin": "stated"
+    },
+    {
+      "id": "BR-03",
+      "requirement_id": "FR-7",
+      "text": "Luxury items have fixed quantity of 1 and a 15-minute stock reservation on add.",
+      "source_ref": "PRD-COM-014 §5, §8 FR-7",
+      "origin": "stated"
+    },
+    {
+      "id": "BR-04",
+      "requirement_id": "FR-9",
+      "text": "OM listings can only be added via accepted unexpired offers with price locked to the offer.",
+      "source_ref": "PRD-COM-014 §5, §8 FR-9",
+      "origin": "stated"
+    },
+    {
+      "id": "BR-05",
+      "requirement_id": "FR-11",
+      "text": "Bulk listings require a business account and quantity >= MOQ.",
+      "source_ref": "PRD-COM-014 §5, §8 FR-11",
+      "origin": "stated"
+    }
+  ],
+  "context": {
+    "user_roles": [
+      "Everyday buyer",
+      "Cautious buyer",
+      "Luxury buyer",
+      "Negotiating buyer",
+      "Business buyer"
+    ],
+    "preconditions": [
+      "Buyer is logged in",
+      "Listings, prices and stock available from Listing service"
+    ],
+    "expected_behavior": [
+      "Server validates listing state, stock and buyer eligibility",
+      "Items are added or quantities updated",
+      "Cart revalidates on open and checkout start"
+    ]
+  },
+  "clarifications": [
+    {
+      "id": "Q-1",
+      "question": "Should guest buyers get a cart in v1, or is login required?",
+      "why": "Determines auth handling for add to cart API endpoints.",
+      "severity": "non_blocking",
+      "related_refs": [
+        "FR-2"
+      ],
+      "status": "assumed",
+      "answer": "Login is required for v1."
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A-1",
+      "text": "Buyer must be logged in to add to cart; guest cart is out of scope for v1.",
+      "related_refs": [
+        "FR-2"
+      ],
+      "from_clarification": "Q-1"
+    }
+  ]
+}

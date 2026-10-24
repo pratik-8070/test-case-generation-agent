@@ -1,0 +1,10 @@
+# Feature: Test_99
+
+## Feature context
+
+https://pratikv8070.atlassian.net/wiki/spaces/SD/pages/1081346/PRD+Add+to+Cart+Multi-Type
+
+## Reference material
+
+- https://pratikv8070.atlassian.net/wiki/spaces/SD/pages/1081346/PRD+Add+to+Cart+Multi-Type → `output/2026-10-15-test-99/attachments/confluence-1081346-PRD-Add-to-Cart-Multi-Type.md`
+- Knowledge base: similar test cases → `output/2026-10-15-test-99/attachments/kb-context.md`

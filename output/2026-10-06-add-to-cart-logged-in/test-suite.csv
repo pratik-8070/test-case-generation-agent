@@ -1,0 +1,48 @@
+Test Case ID,Source Refs,Feature,Scenario,Test Type,Priority,Preconditions,Test Data,Test Steps,Expected Result,Postconditions,Assumption,Assumption Refs,Origin,Notes
+TC-CART-001,"AC-001.2, AC-001.3",Add to Cart,Add an in-stock product to an empty cart,Positive,Critical,"User asha@example.com is logged in
+Cart is empty and the cart count shows 0
+Product 'Blue Mug' (₹499.00) has stock 20",product: Blue Mug; price: ₹499.00; stock: 20,"1. Open the 'Blue Mug' product details page
+2. Click 'Add to Cart'
+3. Open the cart","The cart count changes from 0 to 1 and the cart contains exactly one product, 'Blue Mug'",,No,,,
+TC-CART-002,AC-001.1,Add to Cart,'Add to Cart' button is visible and clickable for an in-stock product,UI,High,"User is logged in
+Product 'Blue Mug' has stock 20",product: Blue Mug; stock: 20,"1. Open the 'Blue Mug' product details page
+2. Locate the 'Add to Cart' button
+3. Hover over and click the button","The 'Add to Cart' button is displayed, enabled, and responds to the click by adding the product (cart count increases by 1)",,No,,,
+TC-CART-003,AC-001.4,Add to Cart,"Cart shows the added product's name, price and quantity matching the product page",Validation,High,"User is logged in with an empty cart
+Product 'Blue Mug' (₹499.00) has stock 20",product: Blue Mug; price: ₹499.00; expected_quantity: 1,"1. Open the 'Blue Mug' product details page and note the displayed name and price
+2. Click 'Add to Cart'
+3. Open the cart","The cart line shows name 'Blue Mug', price ₹499.00 (identical to the product page) and quantity 1",,Yes,A-1,,
+TC-CART-004,AC-001.4,Add to Cart,Price with decimals and thousands separator is shown exactly in the cart,Validation,Medium,"User is logged in with an empty cart
+Product 'Desk Lamp Pro' priced ₹1,299.50 has stock 5","product: Desk Lamp Pro; price: ₹1,299.50","1. Open the 'Desk Lamp Pro' product details page
+2. Click 'Add to Cart'
+3. Open the cart","The cart shows price ₹1,299.50 for 'Desk Lamp Pro' with no rounding, truncation or currency change",,No,,,
+TC-CART-005,"AC-001.3, AC-001.4",Add to Cart,Add a different product to a cart that already has items,Positive,High,"User is logged in
+Cart contains 'Blue Mug' only and the cart count shows 1
+Product 'Desk Lamp Pro' (₹1,299.50) has stock 5","existing_cart: Blue Mug; product: Desk Lamp Pro; price: ₹1,299.50","1. Open the 'Desk Lamp Pro' product details page
+2. Click 'Add to Cart'
+3. Open the cart","The cart count changes from 1 to 2; the cart lists 'Blue Mug' and 'Desk Lamp Pro', each with its own name, price and quantity, and 'Blue Mug' is unchanged",,No,,,
+TC-CART-006,"AC-001.5, AC-001.6",Add to Cart,Out-of-stock product cannot be added and a message is shown,Negative,Critical,"User is logged in
+Cart contains 'Blue Mug' only and the cart count shows 1
+Product 'Red Lamp' has stock 0",product: Red Lamp; stock: 0,"1. Open the 'Red Lamp' product details page
+2. Click 'Add to Cart'
+3. Open the cart",A message stating 'Red Lamp' is out of stock is displayed; the cart count stays 1 and the cart still contains only 'Blue Mug',,Yes,A-3,,
+TC-CART-007,"AC-001.2, AC-001.5",Add to Cart,Product with exactly 1 unit in stock (last unit) can be added,Boundary,High,"User is logged in with an empty cart
+Product 'Green Vase' has stock 1",product: Green Vase; stock: 1,"1. Open the 'Green Vase' product details page
+2. Click 'Add to Cart'
+3. Open the cart","No out-of-stock message is shown, the cart count changes from 0 to 1 and the cart contains 'Green Vase'",,No,,,
+TC-CART-008,"AC-001.5, AC-001.6",Add to Cart,Product goes out of stock while its details page is open,Edge Case,High,"User is logged in with an empty cart
+Product 'Green Vase' has stock 1
+A second test account is available to buy the last unit",product: Green Vase; stock_before: 1; stock_after: 0,"1. As the user, open the 'Green Vase' product details page and leave it open
+2. Using the second account, purchase the last 'Green Vase' so its stock becomes 0
+3. Without reloading, as the user click 'Add to Cart'
+4. Open the cart","The out-of-stock message is displayed, the cart count stays 0 and 'Green Vase' is not in the cart",,Yes,A-3,,
+TC-CART-009,"AC-001.2, AC-001.3",Add to Cart,Added product remains in the cart after reloading the page,Edge Case,Medium,"User is logged in with an empty cart
+Product 'Blue Mug' has stock 20",product: Blue Mug,"1. Open the 'Blue Mug' product details page
+2. Click 'Add to Cart'
+3. Reload the browser page
+4. Open the cart",After the reload the cart count still shows 1 and the cart still contains 'Blue Mug',,No,,,
+TC-CART-010,AC-001.3,Add to Cart,Adding the same product a second time,Edge Case,Medium,"User is logged in
+Cart contains 'Blue Mug' with quantity 1 and the cart count shows 1
+Product 'Blue Mug' has stock 20",product: Blue Mug; existing_quantity: 1,"1. Open the 'Blue Mug' product details page
+2. Click 'Add to Cart'
+3. Open the cart",The cart count changes from 1 to 2 and the total quantity of 'Blue Mug' in the cart is 2,,Yes,A-2,,Whether this is one line with quantity 2 or two lines is not specified (Q-2); only the totals are asserted.

@@ -1,0 +1,466 @@
+{
+  "metadata": {
+    "suite_name": "Add to Cart (logged-in user)",
+    "created": "2026-10-06",
+    "input_types": [
+      "REQUIREMENT"
+    ],
+    "analysis_file": "input-analysis.json"
+  },
+  "test_cases": [
+    {
+      "id": "TC-CART-001",
+      "source_refs": [
+        "AC-001.2",
+        "AC-001.3"
+      ],
+      "feature": "Add to Cart",
+      "scenario": "Add an in-stock product to an empty cart",
+      "test_type": "Positive",
+      "priority": "Critical",
+      "preconditions": [
+        "User asha@example.com is logged in",
+        "Cart is empty and the cart count shows 0",
+        "Product 'Blue Mug' (₹499.00) has stock 20"
+      ],
+      "test_data": {
+        "product": "Blue Mug",
+        "price": "₹499.00",
+        "stock": 20
+      },
+      "steps": [
+        "Open the 'Blue Mug' product details page",
+        "Click 'Add to Cart'",
+        "Open the cart"
+      ],
+      "expected_result": "The cart count changes from 0 to 1 and the cart contains exactly one product, 'Blue Mug'",
+      "assumption": false
+    },
+    {
+      "id": "TC-CART-002",
+      "source_refs": [
+        "AC-001.1"
+      ],
+      "feature": "Add to Cart",
+      "scenario": "'Add to Cart' button is visible and clickable for an in-stock product",
+      "test_type": "UI",
+      "priority": "High",
+      "preconditions": [
+        "User is logged in",
+        "Product 'Blue Mug' has stock 20"
+      ],
+      "test_data": {
+        "product": "Blue Mug",
+        "stock": 20
+      },
+      "steps": [
+        "Open the 'Blue Mug' product details page",
+        "Locate the 'Add to Cart' button",
+        "Hover over and click the button"
+      ],
+      "expected_result": "The 'Add to Cart' button is displayed, enabled, and responds to the click by adding the product (cart count increases by 1)",
+      "assumption": false
+    },
+    {
+      "id": "TC-CART-003",
+      "source_refs": [
+        "AC-001.4"
+      ],
+      "feature": "Add to Cart",
+      "scenario": "Cart shows the added product's name, price and quantity matching the product page",
+      "test_type": "Validation",
+      "priority": "High",
+      "preconditions": [
+        "User is logged in with an empty cart",
+        "Product 'Blue Mug' (₹499.00) has stock 20"
+      ],
+      "test_data": {
+        "product": "Blue Mug",
+        "price": "₹499.00",
+        "expected_quantity": 1
+      },
+      "steps": [
+        "Open the 'Blue Mug' product details page and note the displayed name and price",
+        "Click 'Add to Cart'",
+        "Open the cart"
+      ],
+      "expected_result": "The cart line shows name 'Blue Mug', price ₹499.00 (identical to the product page) and quantity 1",
+      "assumption": true,
+      "assumption_refs": [
+        "A-1"
+      ]
+    },
+    {
+      "id": "TC-CART-004",
+      "source_refs": [
+        "AC-001.4"
+      ],
+      "feature": "Add to Cart",
+      "scenario": "Price with decimals and thousands separator is shown exactly in the cart",
+      "test_type": "Validation",
+      "priority": "Medium",
+      "preconditions": [
+        "User is logged in with an empty cart",
+        "Product 'Desk Lamp Pro' priced ₹1,299.50 has stock 5"
+      ],
+      "test_data": {
+        "product": "Desk Lamp Pro",
+        "price": "₹1,299.50"
+      },
+      "steps": [
+        "Open the 'Desk Lamp Pro' product details page",
+        "Click 'Add to Cart'",
+        "Open the cart"
+      ],
+      "expected_result": "The cart shows price ₹1,299.50 for 'Desk Lamp Pro' with no rounding, truncation or currency change",
+      "assumption": false
+    },
+    {
+      "id": "TC-CART-005",
+      "source_refs": [
+        "AC-001.3",
+        "AC-001.4"
+      ],
+      "feature": "Add to Cart",
+      "scenario": "Add a different product to a cart that already has items",
+      "test_type": "Positive",
+      "priority": "High",
+      "preconditions": [
+        "User is logged in",
+        "Cart contains 'Blue Mug' only and the cart count shows 1",
+        "Product 'Desk Lamp Pro' (₹1,299.50) has stock 5"
+      ],
+      "test_data": {
+        "existing_cart": [
+          "Blue Mug"
+        ],
+        "product": "Desk Lamp Pro",
+        "price": "₹1,299.50"
+      },
+      "steps": [
+        "Open the 'Desk Lamp Pro' product details page",
+        "Click 'Add to Cart'",
+        "Open the cart"
+      ],
+      "expected_result": "The cart count changes from 1 to 2; the cart lists 'Blue Mug' and 'Desk Lamp Pro', each with its own name, price and quantity, and 'Blue Mug' is unchanged",
+      "assumption": false
+    },
+    {
+      "id": "TC-CART-006",
+      "source_refs": [
+        "AC-001.5",
+        "AC-001.6"
+      ],
+      "feature": "Add to Cart",
+      "scenario": "Out-of-stock product cannot be added and a message is shown",
+      "test_type": "Negative",
+      "priority": "Critical",
+      "preconditions": [
+        "User is logged in",
+        "Cart contains 'Blue Mug' only and the cart count shows 1",
+        "Product 'Red Lamp' has stock 0"
+      ],
+      "test_data": {
+        "product": "Red Lamp",
+        "stock": 0
+      },
+      "steps": [
+        "Open the 'Red Lamp' product details page",
+        "Click 'Add to Cart'",
+        "Open the cart"
+      ],
+      "expected_result": "A message stating 'Red Lamp' is out of stock is displayed; the cart count stays 1 and the cart still contains only 'Blue Mug'",
+      "assumption": true,
+      "assumption_refs": [
+        "A-3"
+      ]
+    },
+    {
+      "id": "TC-CART-007",
+      "source_refs": [
+        "AC-001.2",
+        "AC-001.5"
+      ],
+      "feature": "Add to Cart",
+      "scenario": "Product with exactly 1 unit in stock (last unit) can be added",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "User is logged in with an empty cart",
+        "Product 'Green Vase' has stock 1"
+      ],
+      "test_data": {
+        "product": "Green Vase",
+        "stock": 1
+      },
+      "steps": [
+        "Open the 'Green Vase' product details page",
+        "Click 'Add to Cart'",
+        "Open the cart"
+      ],
+      "expected_result": "No out-of-stock message is shown, the cart count changes from 0 to 1 and the cart contains 'Green Vase'",
+      "assumption": false
+    },
+    {
+      "id": "TC-CART-008",
+      "source_refs": [
+        "AC-001.5",
+        "AC-001.6"
+      ],
+      "feature": "Add to Cart",
+      "scenario": "Product goes out of stock while its details page is open",
+      "test_type": "Edge Case",
+      "priority": "High",
+      "preconditions": [
+        "User is logged in with an empty cart",
+        "Product 'Green Vase' has stock 1",
+        "A second test account is available to buy the last unit"
+      ],
+      "test_data": {
+        "product": "Green Vase",
+        "stock_before": 1,
+        "stock_after": 0
+      },
+      "steps": [
+        "As the user, open the 'Green Vase' product details page and leave it open",
+        "Using the second account, purchase the last 'Green Vase' so its stock becomes 0",
+        "Without reloading, as the user click 'Add to Cart'",
+        "Open the cart"
+      ],
+      "expected_result": "The out-of-stock message is displayed, the cart count stays 0 and 'Green Vase' is not in the cart",
+      "assumption": true,
+      "assumption_refs": [
+        "A-3"
+      ]
+    },
+    {
+      "id": "TC-CART-009",
+      "source_refs": [
+        "AC-001.2",
+        "AC-001.3"
+      ],
+      "feature": "Add to Cart",
+      "scenario": "Added product remains in the cart after reloading the page",
+      "test_type": "Edge Case",
+      "priority": "Medium",
+      "preconditions": [
+        "User is logged in with an empty cart",
+        "Product 'Blue Mug' has stock 20"
+      ],
+      "test_data": {
+        "product": "Blue Mug"
+      },
+      "steps": [
+        "Open the 'Blue Mug' product details page",
+        "Click 'Add to Cart'",
+        "Reload the browser page",
+        "Open the cart"
+      ],
+      "expected_result": "After the reload the cart count still shows 1 and the cart still contains 'Blue Mug'",
+      "assumption": false
+    },
+    {
+      "id": "TC-CART-010",
+      "source_refs": [
+        "AC-001.3"
+      ],
+      "feature": "Add to Cart",
+      "scenario": "Adding the same product a second time",
+      "test_type": "Edge Case",
+      "priority": "Medium",
+      "preconditions": [
+        "User is logged in",
+        "Cart contains 'Blue Mug' with quantity 1 and the cart count shows 1",
+        "Product 'Blue Mug' has stock 20"
+      ],
+      "test_data": {
+        "product": "Blue Mug",
+        "existing_quantity": 1
+      },
+      "steps": [
+        "Open the 'Blue Mug' product details page",
+        "Click 'Add to Cart'",
+        "Open the cart"
+      ],
+      "expected_result": "The cart count changes from 1 to 2 and the total quantity of 'Blue Mug' in the cart is 2",
+      "notes": "Whether this is one line with quantity 2 or two lines is not specified (Q-2); only the totals are asserted.",
+      "assumption": true,
+      "assumption_refs": [
+        "A-2"
+      ]
+    }
+  ],
+  "coverage_summary": {
+    "gaps": [
+      {
+        "ref": "BR-001",
+        "description": "Behaviour for users who are not logged in",
+        "reason": "The requirement covers logged-in users only; guest behaviour is undefined (Q-4). All cases use a logged-in precondition."
+      },
+      {
+        "description": "Quantity selection, maximum quantity per product and maximum cart size",
+        "reason": "No quantity selector or numeric limits are specified (Q-1), so no quantity validation or boundary cases can be written without inventing rules"
+      },
+      {
+        "description": "Exact out-of-stock message text",
+        "reason": "AC 6 only says 'appropriate message' (Q-3); cases assert that an out-of-stock message appears"
+      },
+      {
+        "description": "Rapid double-click, session expiry before clicking, sale/discounted prices in the cart",
+        "reason": "Expected behaviour is not specified"
+      }
+    ],
+    "notes": "All 6 acceptance criteria are covered: the happy path, the cart count from 0 and from a non-empty cart, data checks in the cart, and out-of-stock blocking, including the stock 1/0 boundary and stock running out while the page is open. Four cases depend on assumptions A-1 to A-3. The biggest gaps are guest behaviour (Q-4) and the absence of quantity rules (Q-1), which limit boundary and validation coverage.",
+    "computed": {
+      "total_test_cases": 10,
+      "positive": 2,
+      "negative": 1,
+      "boundary": 1,
+      "edge": 3,
+      "validation": 2,
+      "by_type": {
+        "Boundary": 1,
+        "Edge Case": 3,
+        "Negative": 1,
+        "Positive": 2,
+        "UI": 1,
+        "Validation": 2
+      },
+      "by_priority": {
+        "Critical": 2,
+        "High": 5,
+        "Medium": 3
+      },
+      "assumption_based": 4,
+      "requirements_identified": 1,
+      "acceptance_criteria_identified": 6,
+      "business_rules_identified": 1,
+      "requirements_covered": 1,
+      "acceptance_criteria_covered": 6,
+      "business_rules_covered": 0,
+      "uncovered": {
+        "requirements": [],
+        "acceptance_criteria": [],
+        "business_rules": [
+          "BR-001"
+        ]
+      },
+      "requirements_without_negative": [],
+      "traceability": {
+        "requirements": [
+          {
+            "id": "REQ-001",
+            "text": "A logged-in user can add an available product to the shopping cart from the product details page",
+            "test_cases": [
+              "TC-CART-001",
+              "TC-CART-002",
+              "TC-CART-003",
+              "TC-CART-004",
+              "TC-CART-005",
+              "TC-CART-006",
+              "TC-CART-007",
+              "TC-CART-008",
+              "TC-CART-009",
+              "TC-CART-010"
+            ],
+            "test_types": [
+              "Boundary",
+              "Edge Case",
+              "Negative",
+              "Positive",
+              "UI",
+              "Validation"
+            ]
+          }
+        ],
+        "acceptance_criteria": [
+          {
+            "id": "AC-001.1",
+            "text": "User can click the 'Add to Cart' button",
+            "test_cases": [
+              "TC-CART-002"
+            ],
+            "test_types": [
+              "UI"
+            ]
+          },
+          {
+            "id": "AC-001.2",
+            "text": "The selected product is added to the cart",
+            "test_cases": [
+              "TC-CART-001",
+              "TC-CART-007",
+              "TC-CART-009"
+            ],
+            "test_types": [
+              "Boundary",
+              "Edge Case",
+              "Positive"
+            ]
+          },
+          {
+            "id": "AC-001.3",
+            "text": "Cart count increases by 1",
+            "test_cases": [
+              "TC-CART-001",
+              "TC-CART-005",
+              "TC-CART-009",
+              "TC-CART-010"
+            ],
+            "test_types": [
+              "Edge Case",
+              "Positive"
+            ]
+          },
+          {
+            "id": "AC-001.4",
+            "text": "Product name, price and quantity are displayed correctly in the cart",
+            "test_cases": [
+              "TC-CART-003",
+              "TC-CART-004",
+              "TC-CART-005"
+            ],
+            "test_types": [
+              "Positive",
+              "Validation"
+            ]
+          },
+          {
+            "id": "AC-001.5",
+            "text": "Out-of-stock products cannot be added to the cart",
+            "test_cases": [
+              "TC-CART-006",
+              "TC-CART-007",
+              "TC-CART-008"
+            ],
+            "test_types": [
+              "Boundary",
+              "Edge Case",
+              "Negative"
+            ]
+          },
+          {
+            "id": "AC-001.6",
+            "text": "User sees an appropriate message when adding an out-of-stock product",
+            "test_cases": [
+              "TC-CART-006",
+              "TC-CART-008"
+            ],
+            "test_types": [
+              "Edge Case",
+              "Negative"
+            ]
+          }
+        ],
+        "business_rules": [
+          {
+            "id": "BR-001",
+            "text": "Adding to cart is specified for logged-in users only",
+            "test_cases": [],
+            "test_types": []
+          }
+        ]
+      }
+    }
+  }
+}

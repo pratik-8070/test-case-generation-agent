@@ -1,0 +1,7 @@
+Test ID,Title,Steps,Expected Result,Priority
+LG-01,Valid login,"Go to login page; enter valid email and password; click Log in",User is logged in successfully,High
+LG-02,Login with valid credentials,"Open login; type correct email/password; press Log in",Login works as expected,High
+LG-03,Invalid password,"Enter valid email and wrong password; click Log in",Error shown,High
+LG-04,Empty fields,"Leave fields blank; click Log in",Error,Medium
+LG-05,Test login,Test the functionality,Works correctly,Low
+LG-06,Logout,"Log in; click Logout",User is logged out and redirected to the homepage,Medium

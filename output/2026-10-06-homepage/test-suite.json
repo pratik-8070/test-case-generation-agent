@@ -1,0 +1,807 @@
+{
+  "metadata": {
+    "suite_name": "Homepage",
+    "created": "2026-10-06",
+    "input_types": [
+      "FEATURE_DESCRIPTION"
+    ],
+    "analysis_file": "input-analysis.json"
+  },
+  "test_cases": [
+    {
+      "id": "TC-HOME-001",
+      "source_refs": [
+        "REQ-001",
+        "REQ-004"
+      ],
+      "feature": "Homepage",
+      "scenario": "Guest opens the homepage and sees the 'Sign in' link",
+      "test_type": "Positive",
+      "priority": "Critical",
+      "preconditions": [
+        "User is not logged in (fresh browser session)"
+      ],
+      "test_data": {
+        "url": "/"
+      },
+      "steps": [
+        "Open the store root URL '/'"
+      ],
+      "expected_result": "Homepage loads with header (logo, search bar, cart icon, 'Sign in' link), hero carousel, Featured Products grid and footer; no 'Hi, ' greeting is shown",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-002",
+      "source_refs": [
+        "REQ-004"
+      ],
+      "feature": "Homepage",
+      "scenario": "Logged-in customer sees 'Hi, <first name>' instead of 'Sign in'",
+      "test_type": "Positive",
+      "priority": "High",
+      "preconditions": [
+        "Customer account with first name 'Asha' exists",
+        "Customer is logged in"
+      ],
+      "test_data": {
+        "first_name": "Asha"
+      },
+      "steps": [
+        "Open '/'",
+        "Look at the right side of the header"
+      ],
+      "expected_result": "Header shows 'Hi, Asha' and the 'Sign in' link is not displayed",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-003",
+      "source_refs": [
+        "REQ-002"
+      ],
+      "feature": "Homepage",
+      "scenario": "Logo returns to the homepage from another page",
+      "test_type": "Positive",
+      "priority": "Medium",
+      "preconditions": [
+        "User is on a page other than the homepage, e.g. /search?q=shoes"
+      ],
+      "test_data": {
+        "start_url": "/search?q=shoes"
+      },
+      "steps": [
+        "Click the ShopEase logo in the header"
+      ],
+      "expected_result": "Browser navigates to '/' and the homepage content is displayed",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-004",
+      "source_refs": [
+        "REQ-003"
+      ],
+      "feature": "Homepage",
+      "scenario": "Cart icon shows the number of items in the cart",
+      "test_type": "Positive",
+      "priority": "High",
+      "preconditions": [
+        "Cart contains 3 items"
+      ],
+      "test_data": {
+        "cart_items": 3
+      },
+      "steps": [
+        "Open '/'",
+        "Look at the cart icon in the header"
+      ],
+      "expected_result": "Cart icon shows the count 3",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-005",
+      "source_refs": [
+        "AC-005.1"
+      ],
+      "feature": "Homepage",
+      "scenario": "Carousel rotates to the next banner every 6 seconds",
+      "test_type": "UI",
+      "priority": "Medium",
+      "preconditions": [
+        "3 active promotions exist (banners B1, B2, B3)"
+      ],
+      "test_data": {
+        "banners": [
+          "B1",
+          "B2",
+          "B3"
+        ],
+        "interval_seconds": 6
+      },
+      "steps": [
+        "Open '/' and note the visible banner (B1)",
+        "Wait 6 seconds without interacting",
+        "Wait another 6 seconds"
+      ],
+      "expected_result": "B2 becomes visible about 6 seconds after load and B3 about 12 seconds after load; no banner changes earlier than 6 seconds",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-006",
+      "source_refs": [
+        "AC-005.2"
+      ],
+      "feature": "Homepage",
+      "scenario": "Right and left arrows move between banners",
+      "test_type": "UI",
+      "priority": "Medium",
+      "preconditions": [
+        "3 active promotions exist (banners B1, B2, B3)"
+      ],
+      "test_data": {
+        "banners": [
+          "B1",
+          "B2",
+          "B3"
+        ]
+      },
+      "steps": [
+        "Open '/' while B1 is visible",
+        "Click the right arrow",
+        "Click the left arrow"
+      ],
+      "expected_result": "After the right arrow B2 is shown; after the left arrow B1 is shown again",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-007",
+      "source_refs": [
+        "AC-005.3"
+      ],
+      "feature": "Homepage",
+      "scenario": "Clicking a banner opens its promotion page",
+      "test_type": "Positive",
+      "priority": "High",
+      "preconditions": [
+        "Active promotion 'Diwali Sale' with promotion page /promo/diwali-sale"
+      ],
+      "test_data": {
+        "banner": "Diwali Sale",
+        "target": "/promo/diwali-sale"
+      },
+      "steps": [
+        "Open '/'",
+        "Navigate the carousel to the 'Diwali Sale' banner",
+        "Click the banner"
+      ],
+      "expected_result": "Browser navigates to /promo/diwali-sale, the configured page of that promotion",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-008",
+      "source_refs": [
+        "BR-001"
+      ],
+      "feature": "Homepage",
+      "scenario": "Carousel shows at most 5 banners when 6 promotions are active",
+      "test_type": "Boundary",
+      "priority": "Medium",
+      "preconditions": [
+        "6 active promotions exist"
+      ],
+      "test_data": {
+        "active_promotions": 6,
+        "max_banners": 5
+      },
+      "steps": [
+        "Open '/'",
+        "Click the right arrow repeatedly, counting distinct banners until the first banner reappears or the arrow stops advancing"
+      ],
+      "expected_result": "Exactly 5 distinct banners are reachable in the carousel",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-009",
+      "source_refs": [
+        "BR-001"
+      ],
+      "feature": "Homepage",
+      "scenario": "Carousel shows all 5 banners when exactly 5 promotions are active",
+      "test_type": "Boundary",
+      "priority": "Low",
+      "preconditions": [
+        "Exactly 5 active promotions exist"
+      ],
+      "test_data": {
+        "active_promotions": 5
+      },
+      "steps": [
+        "Open '/'",
+        "Click the right arrow, counting distinct banners until the first banner reappears or the arrow stops advancing"
+      ],
+      "expected_result": "All 5 promotion banners are reachable, none missing",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-010",
+      "source_refs": [
+        "BR-002"
+      ],
+      "feature": "Homepage",
+      "scenario": "Carousel is hidden when there are no active promotions",
+      "test_type": "Edge Case",
+      "priority": "Medium",
+      "preconditions": [
+        "All promotions are inactive or expired"
+      ],
+      "test_data": {
+        "active_promotions": 0
+      },
+      "steps": [
+        "Open '/'"
+      ],
+      "expected_result": "No carousel area, arrows or empty placeholder are displayed; the Featured Products grid follows the header directly",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-011",
+      "source_refs": [
+        "AC-006.1",
+        "BR-003"
+      ],
+      "feature": "Homepage",
+      "scenario": "Featured Products grid shows 8 complete product cards",
+      "test_type": "Positive",
+      "priority": "High",
+      "preconditions": [
+        "At least 8 in-stock products are marked as featured",
+        "Desktop viewport 1280px wide"
+      ],
+      "test_data": {
+        "featured_products": 8,
+        "viewport_px": 1280
+      },
+      "steps": [
+        "Open '/'",
+        "Scroll to the 'Featured Products' section",
+        "Inspect each product card"
+      ],
+      "expected_result": "Exactly 8 cards are shown in rows of 4; each card shows the product image, name, price and an 'Add to cart' button",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-012",
+      "source_refs": [
+        "AC-006.2"
+      ],
+      "feature": "Homepage",
+      "scenario": "Out-of-stock featured product shows 'Out of stock' instead of 'Add to cart'",
+      "test_type": "Business Rule",
+      "priority": "High",
+      "preconditions": [
+        "Featured product 'Blue Mug' has stock 0"
+      ],
+      "test_data": {
+        "product": "Blue Mug",
+        "stock": 0
+      },
+      "steps": [
+        "Open '/'",
+        "Find the 'Blue Mug' card in the Featured Products grid"
+      ],
+      "expected_result": "The card shows an 'Out of stock' label and no 'Add to cart' button; image, name and price are still shown",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-013",
+      "source_refs": [
+        "AC-007.1",
+        "BR-004"
+      ],
+      "feature": "Homepage",
+      "scenario": "Search with exactly 2 characters using Enter opens the results page",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "User is on '/'"
+      ],
+      "test_data": {
+        "term": "tv"
+      },
+      "steps": [
+        "Type 'tv' in the search bar",
+        "Press Enter"
+      ],
+      "expected_result": "Browser navigates to /search?q=tv",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-014",
+      "source_refs": [
+        "AC-007.2"
+      ],
+      "feature": "Homepage",
+      "scenario": "Search using the search icon opens the results page",
+      "test_type": "Positive",
+      "priority": "High",
+      "preconditions": [
+        "User is on '/'"
+      ],
+      "test_data": {
+        "term": "running shoes"
+      },
+      "steps": [
+        "Type 'running shoes' in the search bar",
+        "Click the search icon"
+      ],
+      "expected_result": "Browser navigates to /search?q=running%20shoes (or running+shoes) and the term is preserved",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-015",
+      "source_refs": [
+        "BR-004"
+      ],
+      "feature": "Homepage",
+      "scenario": "Search with 1 character is not submitted",
+      "test_type": "Boundary",
+      "priority": "Medium",
+      "preconditions": [
+        "User is on '/'"
+      ],
+      "test_data": {
+        "term": "t"
+      },
+      "steps": [
+        "Type 't' in the search bar",
+        "Press Enter",
+        "Click the search icon"
+      ],
+      "expected_result": "The URL stays '/' and the results page is not opened after either action",
+      "assumption": true,
+      "assumption_refs": [
+        "A-1"
+      ]
+    },
+    {
+      "id": "TC-HOME-016",
+      "source_refs": [
+        "BR-004"
+      ],
+      "feature": "Homepage",
+      "scenario": "Empty search is not submitted",
+      "test_type": "Validation",
+      "priority": "Low",
+      "preconditions": [
+        "User is on '/'"
+      ],
+      "test_data": {
+        "term": ""
+      },
+      "steps": [
+        "Leave the search bar empty",
+        "Click the search icon"
+      ],
+      "expected_result": "The URL stays '/' and the results page is not opened",
+      "assumption": true,
+      "assumption_refs": [
+        "A-1"
+      ]
+    },
+    {
+      "id": "TC-HOME-017",
+      "source_refs": [
+        "REQ-008"
+      ],
+      "feature": "Homepage",
+      "scenario": "Footer links open About Us, Contact, Privacy Policy and Terms of Service",
+      "test_type": "Positive",
+      "priority": "Low",
+      "preconditions": [
+        "User is on '/'"
+      ],
+      "test_data": {
+        "links": [
+          "About Us",
+          "Contact",
+          "Privacy Policy",
+          "Terms of Service"
+        ]
+      },
+      "steps": [
+        "Scroll to the footer",
+        "Click each link in test data, returning to '/' after each"
+      ],
+      "expected_result": "All 4 links are present and each opens the page whose title matches the link text",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-018",
+      "source_refs": [
+        "AC-009.1"
+      ],
+      "feature": "Homepage",
+      "scenario": "Featured grid shows 2 products per row at 480px",
+      "test_type": "Compatibility",
+      "priority": "Medium",
+      "preconditions": [
+        "At least 8 featured products"
+      ],
+      "test_data": {
+        "viewport_px": 480
+      },
+      "steps": [
+        "Set the browser viewport width to 480px",
+        "Open '/'",
+        "Scroll to the Featured Products grid"
+      ],
+      "expected_result": "Products are laid out 2 per row (4 rows of 2) with no horizontal scrolling",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-019",
+      "source_refs": [
+        "AC-009.1"
+      ],
+      "feature": "Homepage",
+      "scenario": "Featured grid shows 4 products per row at 481px",
+      "test_type": "Boundary",
+      "priority": "Low",
+      "preconditions": [
+        "At least 8 featured products"
+      ],
+      "test_data": {
+        "viewport_px": 481
+      },
+      "steps": [
+        "Set the browser viewport width to 481px",
+        "Open '/'",
+        "Scroll to the Featured Products grid"
+      ],
+      "expected_result": "Products are laid out 4 per row (2 rows of 4)",
+      "assumption": false
+    },
+    {
+      "id": "TC-HOME-020",
+      "source_refs": [
+        "REQ-003"
+      ],
+      "feature": "Homepage",
+      "scenario": "Cart icon with an empty cart shows a count of 0 or no count badge",
+      "test_type": "Edge Case",
+      "priority": "Low",
+      "preconditions": [
+        "Cart is empty"
+      ],
+      "test_data": {
+        "cart_items": 0
+      },
+      "steps": [
+        "Open '/'",
+        "Look at the cart icon in the header"
+      ],
+      "expected_result": "Cart icon does not show a non-zero number (shows 0 or no badge) and no stale count from a previous session is displayed",
+      "assumption": false
+    }
+  ],
+  "coverage_summary": {
+    "gaps": [
+      {
+        "description": "Which 5 banners are shown when more than 5 promotions are active",
+        "reason": "Selection rule not stated (Q-2)"
+      },
+      {
+        "description": "Grid behaviour with fewer than 8 featured products",
+        "reason": "Not stated (Q-3)"
+      },
+      {
+        "description": "Page performance and accessibility",
+        "reason": "No targets in the description"
+      },
+      {
+        "ref": "REQ-001",
+        "description": "No negative case for serving '/'",
+        "reason": "Display requirement; guest and logged-in states are both covered by TC-HOME-001/002"
+      },
+      {
+        "ref": "REQ-002",
+        "description": "No negative case for the logo link",
+        "reason": "Navigation-only requirement with no failure behaviour described"
+      },
+      {
+        "ref": "REQ-004",
+        "description": "No separate negative case for the greeting",
+        "reason": "TC-HOME-001 asserts the greeting is absent for guests; TC-HOME-002 asserts 'Sign in' is absent when logged in"
+      },
+      {
+        "ref": "REQ-008",
+        "description": "No negative case for footer links",
+        "reason": "Link targets are not specified; only presence and page title are tested"
+      }
+    ],
+    "notes": "All 9 requirements, 8 acceptance criteria and 4 business rules are covered, including the 5-banner limit, the 2-character search minimum and the 480px breakpoint. Search rejection behaviour (TC-HOME-015/016) is based on assumption A-1. Remaining risks are banner selection with more than 5 promotions and a partially filled featured grid.",
+    "computed": {
+      "total_test_cases": 20,
+      "positive": 8,
+      "negative": 0,
+      "boundary": 5,
+      "edge": 2,
+      "validation": 1,
+      "by_type": {
+        "Boundary": 5,
+        "Business Rule": 1,
+        "Compatibility": 1,
+        "Edge Case": 2,
+        "Positive": 8,
+        "UI": 2,
+        "Validation": 1
+      },
+      "by_priority": {
+        "Critical": 1,
+        "High": 7,
+        "Medium": 7,
+        "Low": 5
+      },
+      "assumption_based": 2,
+      "requirements_identified": 9,
+      "acceptance_criteria_identified": 8,
+      "business_rules_identified": 4,
+      "requirements_covered": 9,
+      "acceptance_criteria_covered": 8,
+      "business_rules_covered": 4,
+      "uncovered": {
+        "requirements": [],
+        "acceptance_criteria": [],
+        "business_rules": []
+      },
+      "requirements_without_negative": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-004",
+        "REQ-008"
+      ],
+      "traceability": {
+        "requirements": [
+          {
+            "id": "REQ-001",
+            "text": "Homepage is served at '/' for guests and logged-in customers",
+            "test_cases": [
+              "TC-HOME-001"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "REQ-002",
+            "text": "Header shows the ShopEase logo, which always returns to the homepage",
+            "test_cases": [
+              "TC-HOME-003"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "REQ-003",
+            "text": "Header cart icon shows the number of items in the cart",
+            "test_cases": [
+              "TC-HOME-004",
+              "TC-HOME-020"
+            ],
+            "test_types": [
+              "Edge Case",
+              "Positive"
+            ]
+          },
+          {
+            "id": "REQ-004",
+            "text": "Header shows 'Sign in' for guests and 'Hi, <first name>' for logged-in customers",
+            "test_cases": [
+              "TC-HOME-001",
+              "TC-HOME-002"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "REQ-005",
+            "text": "Hero banner carousel shows promotional banners",
+            "test_cases": [
+              "TC-HOME-005",
+              "TC-HOME-006",
+              "TC-HOME-007",
+              "TC-HOME-008",
+              "TC-HOME-009",
+              "TC-HOME-010"
+            ],
+            "test_types": [
+              "Boundary",
+              "Edge Case",
+              "Positive",
+              "UI"
+            ]
+          },
+          {
+            "id": "REQ-006",
+            "text": "Featured Products grid shows product cards",
+            "test_cases": [
+              "TC-HOME-011",
+              "TC-HOME-012"
+            ],
+            "test_types": [
+              "Business Rule",
+              "Positive"
+            ]
+          },
+          {
+            "id": "REQ-007",
+            "text": "Search bar opens the results page",
+            "test_cases": [
+              "TC-HOME-013",
+              "TC-HOME-014",
+              "TC-HOME-015",
+              "TC-HOME-016"
+            ],
+            "test_types": [
+              "Boundary",
+              "Positive",
+              "Validation"
+            ]
+          },
+          {
+            "id": "REQ-008",
+            "text": "Footer contains About Us, Contact, Privacy Policy and Terms of Service links",
+            "test_cases": [
+              "TC-HOME-017"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "REQ-009",
+            "text": "Page is usable on mobile (<= 480px wide)",
+            "test_cases": [
+              "TC-HOME-018",
+              "TC-HOME-019"
+            ],
+            "test_types": [
+              "Boundary",
+              "Compatibility"
+            ]
+          }
+        ],
+        "acceptance_criteria": [
+          {
+            "id": "AC-005.1",
+            "text": "Carousel auto-rotates every 6 seconds",
+            "test_cases": [
+              "TC-HOME-005"
+            ],
+            "test_types": [
+              "UI"
+            ]
+          },
+          {
+            "id": "AC-005.2",
+            "text": "Left/right arrows move between banners",
+            "test_cases": [
+              "TC-HOME-006"
+            ],
+            "test_types": [
+              "UI"
+            ]
+          },
+          {
+            "id": "AC-005.3",
+            "text": "Each banner links to its promotion page",
+            "test_cases": [
+              "TC-HOME-007"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "AC-006.1",
+            "text": "Each product card shows image, name, price and an 'Add to cart' button",
+            "test_cases": [
+              "TC-HOME-011"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "AC-006.2",
+            "text": "Out-of-stock products show an 'Out of stock' label instead of the 'Add to cart' button",
+            "test_cases": [
+              "TC-HOME-012"
+            ],
+            "test_types": [
+              "Business Rule"
+            ]
+          },
+          {
+            "id": "AC-007.1",
+            "text": "Pressing Enter opens /search?q=<term>",
+            "test_cases": [
+              "TC-HOME-013"
+            ],
+            "test_types": [
+              "Boundary"
+            ]
+          },
+          {
+            "id": "AC-007.2",
+            "text": "Clicking the search icon opens /search?q=<term>",
+            "test_cases": [
+              "TC-HOME-014"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "AC-009.1",
+            "text": "At <= 480px the featured grid shows 2 products per row; otherwise 4 per row",
+            "test_cases": [
+              "TC-HOME-018",
+              "TC-HOME-019"
+            ],
+            "test_types": [
+              "Boundary",
+              "Compatibility"
+            ]
+          }
+        ],
+        "business_rules": [
+          {
+            "id": "BR-001",
+            "text": "The carousel shows at most 5 banners",
+            "test_cases": [
+              "TC-HOME-008",
+              "TC-HOME-009"
+            ],
+            "test_types": [
+              "Boundary"
+            ]
+          },
+          {
+            "id": "BR-002",
+            "text": "If there are no active promotions the carousel is hidden",
+            "test_cases": [
+              "TC-HOME-010"
+            ],
+            "test_types": [
+              "Edge Case"
+            ]
+          },
+          {
+            "id": "BR-003",
+            "text": "The Featured Products grid shows 8 products",
+            "test_cases": [
+              "TC-HOME-011"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "BR-004",
+            "text": "Search requires at least 2 characters",
+            "test_cases": [
+              "TC-HOME-013",
+              "TC-HOME-015",
+              "TC-HOME-016"
+            ],
+            "test_types": [
+              "Boundary",
+              "Validation"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

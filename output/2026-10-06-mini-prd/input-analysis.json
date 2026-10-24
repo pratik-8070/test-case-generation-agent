@@ -1,0 +1,190 @@
+{
+  "metadata": {
+    "run_id": "2026-10-06-mini-prd",
+    "created": "2026-10-06",
+    "notes": "Out of scope per PRD §1.2: wishlist sharing, review moderation tooling."
+  },
+  "inputs": [
+    {
+      "source": "resources/examples/mini-prd.md",
+      "input_type": "PRD",
+      "confidence": "high",
+      "evidence": [
+        "Title 'PRD: ShopEase Engagement Release (v2.4)' with Overview, Users, Out of scope and Non-functional sections",
+        "Three feature sections (§2-§4) with functional requirement IDs FR-2.1..FR-4.4"
+      ]
+    }
+  ],
+  "features": [
+    {
+      "code": "WISHLIST",
+      "name": "Wishlist",
+      "source_ref": "PRD §2"
+    },
+    {
+      "code": "REVIEW",
+      "name": "Product Reviews",
+      "source_ref": "PRD §3"
+    },
+    {
+      "code": "COUPON",
+      "name": "Coupon Codes",
+      "source_ref": "PRD §4"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "FR-2.1",
+      "feature": "WISHLIST",
+      "text": "Customer adds a product to the wishlist with the heart icon; clicking the filled heart removes it",
+      "source_ref": "PRD §2 FR-2.1",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-2.2",
+      "feature": "WISHLIST",
+      "text": "Wishlist holds at most 50 products; adding a 51st shows 'Your wishlist is full (50 items)'",
+      "source_ref": "PRD §2 FR-2.2",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-2.3",
+      "feature": "WISHLIST",
+      "text": "Guest clicking the heart is redirected to login and the product is added after logging in",
+      "source_ref": "PRD §2 FR-2.3",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-2.4",
+      "feature": "WISHLIST",
+      "text": "Wishlist page lists products with current price and stock status and lets the customer move an item to the cart",
+      "source_ref": "PRD §2 FR-2.4",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-3.1",
+      "feature": "REVIEW",
+      "text": "Only customers with a delivered order containing the product can review it",
+      "source_ref": "PRD §3 FR-3.1",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-3.2",
+      "feature": "REVIEW",
+      "text": "A review has a required 1-5 star rating and optional text up to 1000 characters",
+      "source_ref": "PRD §3 FR-3.2",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-3.3",
+      "feature": "REVIEW",
+      "text": "One review per customer per product; it can be edited afterwards",
+      "source_ref": "PRD §3 FR-3.3",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-3.4",
+      "feature": "REVIEW",
+      "text": "Product page shows the average rating rounded to one decimal and the total number of reviews",
+      "source_ref": "PRD §3 FR-3.4",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-4.1",
+      "feature": "COUPON",
+      "text": "Customer can enter one coupon code at checkout; codes are case-insensitive",
+      "source_ref": "PRD §4 FR-4.1",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-4.2",
+      "feature": "COUPON",
+      "text": "A valid coupon applies its percentage or fixed discount to the subtotal before shipping",
+      "source_ref": "PRD §4 FR-4.2",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-4.3",
+      "feature": "COUPON",
+      "text": "Coupons have an expiry date and a minimum subtotal with messages 'This coupon has expired' / 'Add ₹<amount> more to use this coupon'",
+      "source_ref": "PRD §4 FR-4.3",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-4.4",
+      "feature": "COUPON",
+      "text": "The discount can never make the order subtotal negative",
+      "source_ref": "PRD §4 FR-4.4",
+      "origin": "stated"
+    }
+  ],
+  "acceptance_criteria": [],
+  "business_rules": [],
+  "context": {
+    "user_roles": [
+      "Customer (logged in)",
+      "Guest"
+    ]
+  },
+  "clarifications": [
+    {
+      "id": "Q-1",
+      "question": "What is shown when a coupon code does not exist?",
+      "why": "Only expired and minimum-subtotal messages are specified.",
+      "severity": "non_blocking",
+      "related_refs": [
+        "FR-4.1",
+        "FR-4.3"
+      ],
+      "status": "assumed"
+    },
+    {
+      "id": "Q-2",
+      "question": "Is a coupon still valid on its expiry date itself?",
+      "why": "Determines the exact expiry boundary.",
+      "severity": "non_blocking",
+      "related_refs": [
+        "FR-4.3"
+      ],
+      "status": "out_of_scope"
+    },
+    {
+      "id": "Q-3",
+      "question": "Does moving a wishlist item to the cart remove it from the wishlist, and what happens for out-of-stock items?",
+      "why": "FR-2.4 does not say.",
+      "severity": "non_blocking",
+      "related_refs": [
+        "FR-2.4"
+      ],
+      "status": "out_of_scope"
+    },
+    {
+      "id": "Q-4",
+      "question": "What does a product with no reviews show?",
+      "why": "FR-3.4 only defines the average for existing reviews.",
+      "severity": "non_blocking",
+      "related_refs": [
+        "FR-3.4"
+      ],
+      "status": "out_of_scope"
+    },
+    {
+      "id": "Q-5",
+      "question": "What is the target load time for the wishlist page?",
+      "why": "'Should load quickly' is not measurable.",
+      "severity": "non_blocking",
+      "related_refs": [],
+      "status": "out_of_scope"
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A-1",
+      "text": "An unknown coupon code is rejected and no discount is applied (message text unspecified).",
+      "related_refs": [
+        "FR-4.1"
+      ],
+      "from_clarification": "Q-1"
+    }
+  ]
+}

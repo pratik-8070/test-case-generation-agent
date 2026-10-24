@@ -1,0 +1,78 @@
+Test Case ID,Source Refs,Feature,Scenario,Test Type,Priority,Preconditions,Test Data,Test Steps,Expected Result,Postconditions,Assumption,Assumption Refs,Origin,Notes
+TC-ORDERS-API-001,AC-001.1,Orders API,Create an order with only the required fields,Positive,Critical,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",body: items: productId: <P1>; quantity: 1; shippingAddressId: <S1>,"1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`
+2. Send `GET /orders/{id}` with the same header using `id` from the response","Response is `201`; body matches the Order schema: `id` is a uuid, `items` has 1 entry with productId P1 and quantity 1, `total` is a number, `createdAt` is a date-time; `GET /orders/{id}` returns the same order",,No,,,
+TC-ORDERS-API-002,"AC-001.1, BR-004",Orders API,Create an order with all fields including a valid coupon code,Positive,High,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)
+Coupon SAVE2026 exists and is active",body: items: productId: <P1>; quantity: 2; productId: <P2>; quantity: 1; shippingAddressId: <S1>; couponCode: SAVE2026,1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,"Response is `201`; body has a uuid `id` and 2 `items` matching the request (P1 x2, P2 x1)",,No,,,
+TC-ORDERS-API-003,BR-005,Orders API,Successful order reserves stock for each item,Business Rule,Critical,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",body: items: productId: <P1>; quantity: 3; shippingAddressId: <S1>,"1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`
+2. Check the available stock of P1 via the inventory admin view or DB",Response is `201` and the available stock of P1 drops from 50 to 47 (reserved quantity 3),,No,,,
+TC-ORDERS-API-004,"AC-001.2, BR-001",Orders API,Request without items is rejected,Validation,High,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",body: shippingAddressId: <S1>,1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,"Response is `400` with a body containing string `code` and `message` (`field` = ""items"" if provided); no order is created (C1's order list is unchanged)",,No,,,
+TC-ORDERS-API-005,"AC-001.2, BR-001",Orders API,Request without shippingAddressId is rejected,Validation,High,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",body: items: productId: <P1>; quantity: 1,1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,"Response is `400` with a body containing string `code` and `message` (`field` = ""shippingAddressId"" if provided); no order is created (C1's order list is unchanged)",,No,,,
+TC-ORDERS-API-006,BR-002,Orders API,"Empty items array is rejected (0 items, below minItems 1)",Boundary,High,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",body: items: ; shippingAddressId: <S1>,1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged),,No,,,
+TC-ORDERS-API-007,BR-002,Orders API,Order with 20 items (maxItems) is accepted,Boundary,Medium,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)
+20 distinct products with stock >= 1 exist","body: items: 20 entries, each {productId: distinct in-stock product uuid, quantity: 1}; shippingAddressId: <S1>",1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,Response is `201` and the Order body contains 20 items,,No,,,
+TC-ORDERS-API-008,BR-002,Orders API,Order with 21 items (above maxItems 20) is rejected,Boundary,High,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)
+21 distinct products with stock >= 1 exist","body: items: 21 entries, each {productId: distinct in-stock product uuid, quantity: 1}; shippingAddressId: <S1>",1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged),,No,,,
+TC-ORDERS-API-009,BR-003,Orders API,Item quantity 0 (below minimum 1) is rejected,Boundary,High,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",body: items: productId: <P1>; quantity: 0; shippingAddressId: <S1>,1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged),,No,,,
+TC-ORDERS-API-010,BR-003,Orders API,Item quantity 10 (maximum) is accepted,Boundary,Medium,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",body: items: productId: <P1>; quantity: 10; shippingAddressId: <S1>,1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,Response is `201` and the order item for P1 has quantity 10,,No,,,
+TC-ORDERS-API-011,BR-003,Orders API,Item quantity 11 (above maximum 10) is rejected,Boundary,High,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",body: items: productId: <P1>; quantity: 11; shippingAddressId: <S1>,1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged),,No,,,
+TC-ORDERS-API-012,BR-003,Orders API,Non-integer item quantity is rejected,Validation,Medium,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)","body: items: productId: <P1>; quantity: 2.5; shippingAddressId: <S1>; also_try: quantity ""2"" (string)","1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`
+2. Repeat with the `also_try` value","Each request returns `400` with an Error body (`code`, `message`); no order is created",,No,,,
+TC-ORDERS-API-013,BR-003,Orders API,Item with a non-uuid productId is rejected,Validation,Medium,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",body: items: productId: 12345; quantity: 1; shippingAddressId: <S1>,1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged),,No,,,
+TC-ORDERS-API-014,BR-003,Orders API,Item without quantity is rejected,Validation,Medium,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",body: items: productId: <P1>; shippingAddressId: <S1>,1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged),,No,,,
+TC-ORDERS-API-015,BR-006,Orders API,Non-uuid shippingAddressId is rejected,Validation,Medium,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",body: items: productId: <P1>; quantity: 1; shippingAddressId: home-address,1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged),,No,,,
+TC-ORDERS-API-016,BR-004,Orders API,Coupon code of 5 characters (below 6) is rejected,Boundary,Medium,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",body: items: productId: <P1>; quantity: 1; shippingAddressId: <S1>; couponCode: SAVE1,1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged),,No,,,
+TC-ORDERS-API-017,BR-004,Orders API,Coupon code of 13 characters (above 12) is rejected,Boundary,Medium,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",body: items: productId: <P1>; quantity: 1; shippingAddressId: <S1>; couponCode: SAVE2026EXTRA,1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged),,No,,,
+TC-ORDERS-API-018,BR-004,Orders API,Lowercase coupon code violates the pattern and is rejected,Validation,Low,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",body: items: productId: <P1>; quantity: 1; shippingAddressId: <S1>; couponCode: save2026,1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged),,No,,,
+TC-ORDERS-API-019,AC-001.4,Orders API,Order with an out-of-stock item is rejected with 409,Negative,Critical,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)
+Product P3 (uuid) has stock 0",body: items: productId: <P3>; quantity: 1; shippingAddressId: <S1>,1. Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`,"Response is `409` with an Error body (`code`, `message`); no order is created and P3 stock stays 0",,No,,,
+TC-ORDERS-API-020,AC-001.3,Orders API,Create order without a bearer token is rejected,Authentication,Critical,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",headers: ; body: items: productId: <P1>; quantity: 1; shippingAddressId: <S1>,1. Send `POST /orders` with headers `test_data.headers` and body `test_data.body`,Response is `401` and no order is created,,No,,,
+TC-ORDERS-API-021,AC-001.3,Orders API,Create order with an invalid or expired token is rejected,Authentication,High,"Customer C1 has a valid bearer token
+Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50
+C1 has shipping address S1 (uuid)",headers: Authorization: Bearer expired-or-tampered-token; body: items: productId: <P1>; quantity: 1; shippingAddressId: <S1>,1. Send `POST /orders` with headers `test_data.headers` and body `test_data.body`,Response is `401` and no order is created,,No,,,
+TC-ORDERS-API-022,AC-002.1,Orders API,Get own order by id,Positive,High,"Customer C1 has a valid bearer token
+C1 owns order O1",orderId: <O1>,1. Send `GET /orders/{orderId}` with `orderId` from test data and header `Authorization: Bearer <valid_token of customer C1>`,"Response is `200`; body matches the Order schema with `id` = O1 and the items, total and createdAt stored for O1",,No,,,
+TC-ORDERS-API-023,AC-002.3,Orders API,Get an order id that does not exist,Negative,Medium,"Customer C1 has a valid bearer token
+No order with the test orderId exists",orderId: 00000000-0000-4000-8000-000000000000,1. Send `GET /orders/{orderId}` with `orderId` from test data and header `Authorization: Bearer <valid_token of customer C1>`,Response is `404` and no order data is returned,,No,,,
+TC-ORDERS-API-024,AC-002.3,Orders API,Get another customer's order returns 404,Authorization,Critical,"Customer C1 has a valid bearer token
+Customer C2 owns order O2",orderId: <O2 owned by C2>,1. Send `GET /orders/{orderId}` with `orderId` from test data and header `Authorization: Bearer <valid_token of customer C1>`,Response is `404` (not `200` or `403`) and no data from C2's order is returned,,No,,,
+TC-ORDERS-API-025,AC-002.2,Orders API,Get order without a bearer token is rejected,Authentication,High,C1 owns order O1,orderId: <O1>,1. Send `GET /orders/{orderId}` with `orderId` from test data and header `(no Authorization header)`,Response is `401` and no order data is returned,,No,,,

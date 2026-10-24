@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+google_client_secret.json
+.google_token.json
+.slack_app_token.json
+
+# Runtime / local-only files
+output/slack_bot.log
+CALUDE.md
+.DS_Store
+*.pyc

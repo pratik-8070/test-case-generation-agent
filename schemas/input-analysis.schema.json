@@ -1,0 +1,141 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "input-analysis.schema.json",
+  "title": "Input Analysis",
+  "description": "Output of stages 1-4 (classification, extraction, clarification). Saved as input-analysis.json in the run folder.",
+  "type": "object",
+  "required": ["metadata", "inputs", "features", "requirements", "acceptance_criteria", "business_rules", "clarifications", "assumptions"],
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["run_id", "created"],
+      "properties": {
+        "run_id": {"type": "string", "minLength": 1},
+        "created": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}"},
+        "notes": {"type": "string"}
+      }
+    },
+    "inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["source", "input_type", "confidence", "evidence"],
+        "properties": {
+          "source": {"type": "string", "minLength": 1},
+          "input_type": {"$ref": "#/$defs/input_type"},
+          "secondary_types": {"type": "array", "items": {"$ref": "#/$defs/input_type"}},
+          "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
+          "evidence": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "features": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["code", "name"],
+        "properties": {
+          "code": {"type": "string", "pattern": "^[A-Z0-9]+(-[A-Z0-9]+)*$"},
+          "name": {"type": "string", "minLength": 1},
+          "source_ref": {"type": "string"},
+          "description": {"type": "string"}
+        }
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "feature", "text", "source_ref", "origin"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "feature": {"type": "string", "pattern": "^[A-Z0-9]+(-[A-Z0-9]+)*$"},
+          "text": {"type": "string", "minLength": 1},
+          "source_ref": {"type": "string", "minLength": 1},
+          "origin": {"$ref": "#/$defs/origin"},
+          "user_role": {"type": "string"},
+          "details": {"$ref": "#/$defs/details"}
+        }
+      }
+    },
+    "acceptance_criteria": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/child_item"}
+    },
+    "business_rules": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/child_item"}
+    },
+    "context": {"$ref": "#/$defs/details"},
+    "clarifications": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "question", "severity", "status"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^Q-\\d+$"},
+          "question": {"type": "string", "minLength": 1},
+          "why": {"type": "string"},
+          "severity": {"type": "string", "enum": ["blocking", "non_blocking"]},
+          "related_refs": {"type": "array", "items": {"type": "string"}},
+          "status": {"type": "string", "enum": ["open", "answered", "assumed", "out_of_scope"]},
+          "answer": {"type": "string"}
+        }
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "text"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^A-\\d+$"},
+          "text": {"type": "string", "minLength": 1},
+          "related_refs": {"type": "array", "items": {"type": "string"}},
+          "from_clarification": {"type": "string"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "input_type": {
+      "type": "string",
+      "enum": ["REQUIREMENT", "USER_STORY", "ACCEPTANCE_CRITERIA", "FEATURE_DESCRIPTION", "PRD", "BRD", "TECHNICAL_SPEC", "API_SPEC", "UI_DESIGN", "EXISTING_TEST_CASES", "PLAIN_TEXT", "UNKNOWN"]
+    },
+    "origin": {
+      "type": "string",
+      "enum": ["stated", "observed", "inferred", "clarified"]
+    },
+    "child_item": {
+      "type": "object",
+      "required": ["id", "requirement_id", "text", "source_ref", "origin"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "requirement_id": {"type": "string", "minLength": 1},
+        "text": {"type": "string", "minLength": 1},
+        "source_ref": {"type": "string", "minLength": 1},
+        "origin": {"$ref": "#/$defs/origin"}
+      }
+    },
+    "details": {
+      "type": "object",
+      "properties": {
+        "user_roles": {"type": "array", "items": {"type": "string"}},
+        "preconditions": {"type": "array", "items": {"type": "string"}},
+        "dependencies": {"type": "array", "items": {"type": "string"}},
+        "inputs": {"type": "array", "items": {"type": "string"}},
+        "expected_behavior": {"type": "array", "items": {"type": "string"}},
+        "validations": {"type": "array", "items": {"type": "string"}},
+        "error_conditions": {"type": "array", "items": {"type": "string"}},
+        "boundary_conditions": {"type": "array", "items": {"type": "string"}},
+        "data_requirements": {"type": "array", "items": {"type": "string"}},
+        "ui_behavior": {"type": "array", "items": {"type": "string"}},
+        "api_behavior": {"type": "array", "items": {"type": "string"}},
+        "auth": {"type": "array", "items": {"type": "string"}},
+        "external_dependencies": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

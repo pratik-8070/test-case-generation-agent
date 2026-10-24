@@ -1,0 +1,22 @@
+Test Case ID,Source Refs,Feature,Scenario,Test Type,Priority,Preconditions,Test Data,Test Steps,Expected Result,Postconditions,Assumption,Assumption Refs,Origin,Notes
+TC-LOGIN-001,REQ-001,Login,Log in with a valid email and password,Positive,High,"Active account user@example.com exists with password Valid#Pass1
+User is logged out and on the login page",email: user@example.com; password: Valid#Pass1,"1. Enter `email` and `password` from test data
+2. Click 'Log in'",The user leaves the login page and the header shows the logged-in state (account name and a 'Logout' option),,Yes,A-1,improved,Merged duplicates LG-01 and LG-02; replaced 'logged in successfully' / 'works as expected' with observable outcomes.
+TC-LOGIN-002,REQ-002,Login,Log in with a valid email and a wrong password,Negative,High,"Active account user@example.com exists with password Valid#Pass1
+User is on the login page",email: user@example.com; password: Wrong#Pass9,"1. Enter `email` and `password` from test data
+2. Click 'Log in'",An error message is displayed on the login page and the user remains on the login page and is not logged in (no logged-in header state),,Yes,"A-1, A-2",improved,
+TC-LOGIN-003,REQ-003,Login,Submit the login form with both fields empty,Validation,Medium,User is on the login page,email: ; password: ,"1. Leave Email and Password empty
+2. Click 'Log in'",An error or required-field indication is shown for the empty fields and the user remains on the login page and is not logged in (no logged-in header state),,Yes,"A-1, A-2",improved,
+TC-LOGIN-004,REQ-002,Login,Log in with an email that is not registered,Negative,High,"No account exists for nobody@example.com
+User is on the login page",email: nobody@example.com; password: Valid#Pass1,"1. Enter `email` and `password` from test data
+2. Click 'Log in'",An error message is displayed and the user remains on the login page and is not logged in (no logged-in header state),,Yes,"A-1, A-2",new,
+TC-LOGIN-005,REQ-003,Login,Submit with email filled and password empty,Validation,Medium,User is on the login page,email: user@example.com; password: ,"1. Enter only the email
+2. Click 'Log in'",An error or required-field indication is shown for the password field and the user remains on the login page and is not logged in (no logged-in header state),,Yes,"A-1, A-2",new,
+TC-LOGIN-006,REQ-003,Login,Submit with password filled and email empty,Validation,Medium,User is on the login page,email: ; password: Valid#Pass1,"1. Enter only the password
+2. Click 'Log in'",An error or required-field indication is shown for the email field and the user remains on the login page and is not logged in (no logged-in header state),,Yes,"A-1, A-2",new,
+TC-LOGOUT-001,REQ-004,Logout,Log out from a logged-in session,Positive,Medium,Active account user@example.com exists with password Valid#Pass1,email: user@example.com; password: Valid#Pass1,"1. Log in with the test data credentials
+2. Click Logout",User is logged out and redirected to the homepage,,Yes,A-1,existing,
+TC-LOGOUT-002,REQ-004,Logout,Back button after logout does not restore the logged-in session,Session,Medium,"Active account user@example.com exists with password Valid#Pass1
+User is logged in and viewing their account page",,"1. Click Logout
+2. Press the browser Back button
+3. Reload the page",The account page is not shown in a logged-in state after reload; the header shows the logged-out state,,Yes,A-1,new,Common logout risk not covered by the original suite.

@@ -1,0 +1,47 @@
+{
+  "metadata": {"run_id": "2026-10-06-login", "created": "2026-10-06"},
+  "inputs": [
+    {
+      "source": "resources/examples/login.md",
+      "input_type": "USER_STORY",
+      "confidence": "high",
+      "evidence": ["'As a registered customer, I want to log in ... so that ...' story format", "Story id 'US-101' with an attached 'Acceptance Criteria' list AC1-AC6"],
+      "secondary_types": ["ACCEPTANCE_CRITERIA"]
+    }
+  ],
+  "features": [{"code": "LOGIN", "name": "Login", "source_ref": "US-101"}],
+  "requirements": [
+    {
+      "id": "US-101", "feature": "LOGIN", "text": "A registered customer can log in with email and password to access their account", "source_ref": "US-101 story", "origin": "stated",
+      "user_role": "Registered customer",
+      "details": {
+        "inputs": ["email", "password"],
+        "validations": ["email format (AC4)", "both fields non-empty to enable 'Log in' (AC3)"],
+        "error_conditions": ["invalid credentials (AC2)", "locked account (AC5)"],
+        "boundary_conditions": ["5 consecutive failures -> lock (AC5)", "15-minute lock duration (AC5)", "password length 8-64 (Notes)"]
+      }
+    }
+  ],
+  "acceptance_criteria": [
+    {"id": "AC1", "requirement_id": "US-101", "text": "Correct email and password for an active account redirects to the 'My Account' page", "source_ref": "login.md AC1", "origin": "stated"},
+    {"id": "AC2", "requirement_id": "US-101", "text": "Incorrect email or password shows 'Invalid email or password' and the customer remains on the login page", "source_ref": "login.md AC2", "origin": "stated"},
+    {"id": "AC3", "requirement_id": "US-101", "text": "'Log in' button is disabled until both email and password are non-empty", "source_ref": "login.md AC3", "origin": "stated"},
+    {"id": "AC4", "requirement_id": "US-101", "text": "Invalid email format shows inline 'Enter a valid email address' under the field", "source_ref": "login.md AC4", "origin": "stated"},
+    {"id": "AC5", "requirement_id": "US-101", "text": "After 5 consecutive failed attempts the account is locked for 15 minutes and 'Your account is locked. Try again in 15 minutes.' is shown", "source_ref": "login.md AC5", "origin": "stated"},
+    {"id": "AC6", "requirement_id": "US-101", "text": "Email matching is case-insensitive", "source_ref": "login.md AC6", "origin": "stated"}
+  ],
+  "business_rules": [
+    {"id": "BR-001", "requirement_id": "US-101", "text": "Password is 8-64 characters (existing registration rule)", "source_ref": "login.md Notes bullet 1", "origin": "stated"},
+    {"id": "BR-002", "requirement_id": "US-101", "text": "A successful login resets the failed-attempt counter", "source_ref": "login.md Notes bullet 2", "origin": "stated"},
+    {"id": "BR-003", "requirement_id": "US-101", "text": "While locked, a login with the correct password is also rejected with the lock message", "source_ref": "inferred from AC5 'account is locked'", "origin": "inferred"}
+  ],
+  "clarifications": [
+    {"id": "Q-1", "question": "While the account is locked, is a login with the correct password rejected with the lock message?", "why": "AC5 says the account is locked but does not state the response for correct credentials during the lock.", "severity": "non_blocking", "related_refs": ["AC5"], "status": "assumed"},
+    {"id": "Q-2", "question": "Does the login form enforce the 8-64 password length itself, or does an out-of-range password simply fail as invalid credentials?", "why": "Decides whether 7/65-character passwords get a validation message or the AC2 message.", "severity": "non_blocking", "related_refs": ["BR-001"], "status": "assumed"},
+    {"id": "Q-3", "question": "Are failed attempts with an unregistered email or an invalid email format counted towards the lock?", "why": "Affects lockout counting edge cases; not stated.", "severity": "non_blocking", "related_refs": ["AC5"], "status": "out_of_scope"}
+  ],
+  "assumptions": [
+    {"id": "A-1", "text": "During the 15-minute lock, the correct password is rejected with 'Your account is locked. Try again in 15 minutes.'", "related_refs": ["AC5", "BR-003"], "from_clarification": "Q-1"},
+    {"id": "A-2", "text": "The login form does not validate password length; BR-001 is only used to confirm that 8- and 64-character passwords work at login. Out-of-range lengths are not tested.", "related_refs": ["BR-001"], "from_clarification": "Q-2"}
+  ]
+}

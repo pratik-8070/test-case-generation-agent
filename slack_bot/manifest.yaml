@@ -1,0 +1,27 @@
+# Paste into https://api.slack.com/apps -> Create New App -> From a manifest
+display_information:
+  name: Test Case Generator
+  description: Generates structured, traceable QA test cases from feature details.
+features:
+  bot_user:
+    display_name: Test Case Generator
+    always_online: true
+  slash_commands:
+    - command: /test-case
+      description: Generate test cases for a feature
+      should_escape: false
+oauth_config:
+  scopes:
+    bot:
+      - commands          # /test-case
+      - chat:write        # post and update results
+      - chat:write.public # post in public channels without being invited
+      - files:write       # attach the .md / .csv / .json
+      - files:read        # read files uploaded in the modal (required for the Attachments field)
+      - im:write          # DM fallback when it can't post in the channel
+settings:
+  interactivity:
+    is_enabled: true      # modal submissions (delivered over Socket Mode)
+  socket_mode_enabled: true
+  org_deploy_enabled: false
+  token_rotation_enabled: false

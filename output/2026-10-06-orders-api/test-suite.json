@@ -1,0 +1,1015 @@
+{
+  "metadata": {
+    "suite_name": "Orders API v1.2.0",
+    "created": "2026-10-06",
+    "input_types": [
+      "API_SPEC"
+    ],
+    "analysis_file": "input-analysis.json"
+  },
+  "test_cases": [
+    {
+      "id": "TC-ORDERS-API-001",
+      "source_refs": [
+        "AC-001.1"
+      ],
+      "feature": "Orders API",
+      "scenario": "Create an order with only the required fields",
+      "test_type": "Positive",
+      "priority": "Critical",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>",
+              "quantity": 1
+            }
+          ],
+          "shippingAddressId": "<S1>"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`",
+        "Send `GET /orders/{id}` with the same header using `id` from the response"
+      ],
+      "expected_result": "Response is `201`; body matches the Order schema: `id` is a uuid, `items` has 1 entry with productId P1 and quantity 1, `total` is a number, `createdAt` is a date-time; `GET /orders/{id}` returns the same order",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-002",
+      "source_refs": [
+        "AC-001.1",
+        "BR-004"
+      ],
+      "feature": "Orders API",
+      "scenario": "Create an order with all fields including a valid coupon code",
+      "test_type": "Positive",
+      "priority": "High",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)",
+        "Coupon SAVE2026 exists and is active"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>",
+              "quantity": 2
+            },
+            {
+              "productId": "<P2>",
+              "quantity": 1
+            }
+          ],
+          "shippingAddressId": "<S1>",
+          "couponCode": "SAVE2026"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `201`; body has a uuid `id` and 2 `items` matching the request (P1 x2, P2 x1)",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-003",
+      "source_refs": [
+        "BR-005"
+      ],
+      "feature": "Orders API",
+      "scenario": "Successful order reserves stock for each item",
+      "test_type": "Business Rule",
+      "priority": "Critical",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>",
+              "quantity": 3
+            }
+          ],
+          "shippingAddressId": "<S1>"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`",
+        "Check the available stock of P1 via the inventory admin view or DB"
+      ],
+      "expected_result": "Response is `201` and the available stock of P1 drops from 50 to 47 (reserved quantity 3)",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-004",
+      "source_refs": [
+        "AC-001.2",
+        "BR-001"
+      ],
+      "feature": "Orders API",
+      "scenario": "Request without items is rejected",
+      "test_type": "Validation",
+      "priority": "High",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "shippingAddressId": "<S1>"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `400` with a body containing string `code` and `message` (`field` = \"items\" if provided); no order is created (C1's order list is unchanged)",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-005",
+      "source_refs": [
+        "AC-001.2",
+        "BR-001"
+      ],
+      "feature": "Orders API",
+      "scenario": "Request without shippingAddressId is rejected",
+      "test_type": "Validation",
+      "priority": "High",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>",
+              "quantity": 1
+            }
+          ]
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `400` with a body containing string `code` and `message` (`field` = \"shippingAddressId\" if provided); no order is created (C1's order list is unchanged)",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-006",
+      "source_refs": [
+        "BR-002"
+      ],
+      "feature": "Orders API",
+      "scenario": "Empty items array is rejected (0 items, below minItems 1)",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "items": [],
+          "shippingAddressId": "<S1>"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged)",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-007",
+      "source_refs": [
+        "BR-002"
+      ],
+      "feature": "Orders API",
+      "scenario": "Order with 20 items (maxItems) is accepted",
+      "test_type": "Boundary",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)",
+        "20 distinct products with stock >= 1 exist"
+      ],
+      "test_data": {
+        "body": {
+          "items": "20 entries, each {productId: distinct in-stock product uuid, quantity: 1}",
+          "shippingAddressId": "<S1>"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `201` and the Order body contains 20 items",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-008",
+      "source_refs": [
+        "BR-002"
+      ],
+      "feature": "Orders API",
+      "scenario": "Order with 21 items (above maxItems 20) is rejected",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)",
+        "21 distinct products with stock >= 1 exist"
+      ],
+      "test_data": {
+        "body": {
+          "items": "21 entries, each {productId: distinct in-stock product uuid, quantity: 1}",
+          "shippingAddressId": "<S1>"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged)",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-009",
+      "source_refs": [
+        "BR-003"
+      ],
+      "feature": "Orders API",
+      "scenario": "Item quantity 0 (below minimum 1) is rejected",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>",
+              "quantity": 0
+            }
+          ],
+          "shippingAddressId": "<S1>"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged)",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-010",
+      "source_refs": [
+        "BR-003"
+      ],
+      "feature": "Orders API",
+      "scenario": "Item quantity 10 (maximum) is accepted",
+      "test_type": "Boundary",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>",
+              "quantity": 10
+            }
+          ],
+          "shippingAddressId": "<S1>"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `201` and the order item for P1 has quantity 10",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-011",
+      "source_refs": [
+        "BR-003"
+      ],
+      "feature": "Orders API",
+      "scenario": "Item quantity 11 (above maximum 10) is rejected",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>",
+              "quantity": 11
+            }
+          ],
+          "shippingAddressId": "<S1>"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged)",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-012",
+      "source_refs": [
+        "BR-003"
+      ],
+      "feature": "Orders API",
+      "scenario": "Non-integer item quantity is rejected",
+      "test_type": "Validation",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>",
+              "quantity": 2.5
+            }
+          ],
+          "shippingAddressId": "<S1>"
+        },
+        "also_try": "quantity \"2\" (string)"
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`",
+        "Repeat with the `also_try` value"
+      ],
+      "expected_result": "Each request returns `400` with an Error body (`code`, `message`); no order is created",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-013",
+      "source_refs": [
+        "BR-003"
+      ],
+      "feature": "Orders API",
+      "scenario": "Item with a non-uuid productId is rejected",
+      "test_type": "Validation",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "12345",
+              "quantity": 1
+            }
+          ],
+          "shippingAddressId": "<S1>"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged)",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-014",
+      "source_refs": [
+        "BR-003"
+      ],
+      "feature": "Orders API",
+      "scenario": "Item without quantity is rejected",
+      "test_type": "Validation",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>"
+            }
+          ],
+          "shippingAddressId": "<S1>"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged)",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-015",
+      "source_refs": [
+        "BR-006"
+      ],
+      "feature": "Orders API",
+      "scenario": "Non-uuid shippingAddressId is rejected",
+      "test_type": "Validation",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>",
+              "quantity": 1
+            }
+          ],
+          "shippingAddressId": "home-address"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged)",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-016",
+      "source_refs": [
+        "BR-004"
+      ],
+      "feature": "Orders API",
+      "scenario": "Coupon code of 5 characters (below 6) is rejected",
+      "test_type": "Boundary",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>",
+              "quantity": 1
+            }
+          ],
+          "shippingAddressId": "<S1>",
+          "couponCode": "SAVE1"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged)",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-017",
+      "source_refs": [
+        "BR-004"
+      ],
+      "feature": "Orders API",
+      "scenario": "Coupon code of 13 characters (above 12) is rejected",
+      "test_type": "Boundary",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>",
+              "quantity": 1
+            }
+          ],
+          "shippingAddressId": "<S1>",
+          "couponCode": "SAVE2026EXTRA"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged)",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-018",
+      "source_refs": [
+        "BR-004"
+      ],
+      "feature": "Orders API",
+      "scenario": "Lowercase coupon code violates the pattern and is rejected",
+      "test_type": "Validation",
+      "priority": "Low",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>",
+              "quantity": 1
+            }
+          ],
+          "shippingAddressId": "<S1>",
+          "couponCode": "save2026"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `400` with a body containing string `code` and `message`; no order is created (C1's order list is unchanged)",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-019",
+      "source_refs": [
+        "AC-001.4"
+      ],
+      "feature": "Orders API",
+      "scenario": "Order with an out-of-stock item is rejected with 409",
+      "test_type": "Negative",
+      "priority": "Critical",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)",
+        "Product P3 (uuid) has stock 0"
+      ],
+      "test_data": {
+        "body": {
+          "items": [
+            {
+              "productId": "<P3>",
+              "quantity": 1
+            }
+          ],
+          "shippingAddressId": "<S1>"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with header `Authorization: Bearer <valid_token of customer C1>` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `409` with an Error body (`code`, `message`); no order is created and P3 stock stays 0",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-020",
+      "source_refs": [
+        "AC-001.3"
+      ],
+      "feature": "Orders API",
+      "scenario": "Create order without a bearer token is rejected",
+      "test_type": "Authentication",
+      "priority": "Critical",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "headers": {},
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>",
+              "quantity": 1
+            }
+          ],
+          "shippingAddressId": "<S1>"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with headers `test_data.headers` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `401` and no order is created",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-021",
+      "source_refs": [
+        "AC-001.3"
+      ],
+      "feature": "Orders API",
+      "scenario": "Create order with an invalid or expired token is rejected",
+      "test_type": "Authentication",
+      "priority": "High",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Product P1 (uuid) has stock 50; product P2 (uuid) has stock 50",
+        "C1 has shipping address S1 (uuid)"
+      ],
+      "test_data": {
+        "headers": {
+          "Authorization": "Bearer expired-or-tampered-token"
+        },
+        "body": {
+          "items": [
+            {
+              "productId": "<P1>",
+              "quantity": 1
+            }
+          ],
+          "shippingAddressId": "<S1>"
+        }
+      },
+      "steps": [
+        "Send `POST /orders` with headers `test_data.headers` and body `test_data.body`"
+      ],
+      "expected_result": "Response is `401` and no order is created",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-022",
+      "source_refs": [
+        "AC-002.1"
+      ],
+      "feature": "Orders API",
+      "scenario": "Get own order by id",
+      "test_type": "Positive",
+      "priority": "High",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "C1 owns order O1"
+      ],
+      "test_data": {
+        "orderId": "<O1>"
+      },
+      "steps": [
+        "Send `GET /orders/{orderId}` with `orderId` from test data and header `Authorization: Bearer <valid_token of customer C1>`"
+      ],
+      "expected_result": "Response is `200`; body matches the Order schema with `id` = O1 and the items, total and createdAt stored for O1",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-023",
+      "source_refs": [
+        "AC-002.3"
+      ],
+      "feature": "Orders API",
+      "scenario": "Get an order id that does not exist",
+      "test_type": "Negative",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "No order with the test orderId exists"
+      ],
+      "test_data": {
+        "orderId": "00000000-0000-4000-8000-000000000000"
+      },
+      "steps": [
+        "Send `GET /orders/{orderId}` with `orderId` from test data and header `Authorization: Bearer <valid_token of customer C1>`"
+      ],
+      "expected_result": "Response is `404` and no order data is returned",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-024",
+      "source_refs": [
+        "AC-002.3"
+      ],
+      "feature": "Orders API",
+      "scenario": "Get another customer's order returns 404",
+      "test_type": "Authorization",
+      "priority": "Critical",
+      "preconditions": [
+        "Customer C1 has a valid bearer token",
+        "Customer C2 owns order O2"
+      ],
+      "test_data": {
+        "orderId": "<O2 owned by C2>"
+      },
+      "steps": [
+        "Send `GET /orders/{orderId}` with `orderId` from test data and header `Authorization: Bearer <valid_token of customer C1>`"
+      ],
+      "expected_result": "Response is `404` (not `200` or `403`) and no data from C2's order is returned",
+      "assumption": false
+    },
+    {
+      "id": "TC-ORDERS-API-025",
+      "source_refs": [
+        "AC-002.2"
+      ],
+      "feature": "Orders API",
+      "scenario": "Get order without a bearer token is rejected",
+      "test_type": "Authentication",
+      "priority": "High",
+      "preconditions": [
+        "C1 owns order O1"
+      ],
+      "test_data": {
+        "orderId": "<O1>"
+      },
+      "steps": [
+        "Send `GET /orders/{orderId}` with `orderId` from test data and header `(no Authorization header)`"
+      ],
+      "expected_result": "Response is `401` and no order data is returned",
+      "assumption": false
+    }
+  ],
+  "coverage_summary": {
+    "gaps": [
+      {
+        "description": "GET with a non-uuid orderId: response code not documented",
+        "reason": "Q-1"
+      },
+      {
+        "description": "Non-existent/expired coupon and the coupon's effect on total",
+        "reason": "Q-2; only the pattern is specified"
+      },
+      {
+        "description": "Unknown or foreign productId / shippingAddressId",
+        "reason": "Q-3; response not documented"
+      },
+      {
+        "description": "Order status after creation, total calculation, rate limiting, idempotency of POST",
+        "reason": "Not specified in the spec"
+      }
+    ],
+    "notes": "Both endpoints and every documented status code (200, 201, 400, 401, 404, 409) are covered, with boundaries for items (0/20/21), quantity (0/10/11) and coupon length (5/13). Cross-customer access is tested as 404 per the spec. The largest risks are undocumented responses for unknown references and coupon semantics (Q-2, Q-3).",
+    "computed": {
+      "total_test_cases": 25,
+      "positive": 3,
+      "negative": 2,
+      "boundary": 8,
+      "edge": 0,
+      "validation": 7,
+      "by_type": {
+        "Authentication": 3,
+        "Authorization": 1,
+        "Boundary": 8,
+        "Business Rule": 1,
+        "Negative": 2,
+        "Positive": 3,
+        "Validation": 7
+      },
+      "by_priority": {
+        "Critical": 5,
+        "High": 10,
+        "Medium": 9,
+        "Low": 1
+      },
+      "assumption_based": 0,
+      "requirements_identified": 2,
+      "acceptance_criteria_identified": 7,
+      "business_rules_identified": 6,
+      "requirements_covered": 2,
+      "acceptance_criteria_covered": 7,
+      "business_rules_covered": 6,
+      "uncovered": {
+        "requirements": [],
+        "acceptance_criteria": [],
+        "business_rules": []
+      },
+      "requirements_without_negative": [],
+      "traceability": {
+        "requirements": [
+          {
+            "id": "REQ-001",
+            "text": "POST /orders creates an order from the caller's cart items",
+            "test_cases": [
+              "TC-ORDERS-API-001",
+              "TC-ORDERS-API-002",
+              "TC-ORDERS-API-003",
+              "TC-ORDERS-API-004",
+              "TC-ORDERS-API-005",
+              "TC-ORDERS-API-006",
+              "TC-ORDERS-API-007",
+              "TC-ORDERS-API-008",
+              "TC-ORDERS-API-009",
+              "TC-ORDERS-API-010",
+              "TC-ORDERS-API-011",
+              "TC-ORDERS-API-012",
+              "TC-ORDERS-API-013",
+              "TC-ORDERS-API-014",
+              "TC-ORDERS-API-015",
+              "TC-ORDERS-API-016",
+              "TC-ORDERS-API-017",
+              "TC-ORDERS-API-018",
+              "TC-ORDERS-API-019",
+              "TC-ORDERS-API-020",
+              "TC-ORDERS-API-021"
+            ],
+            "test_types": [
+              "Authentication",
+              "Boundary",
+              "Business Rule",
+              "Negative",
+              "Positive",
+              "Validation"
+            ]
+          },
+          {
+            "id": "REQ-002",
+            "text": "GET /orders/{orderId} returns an order by id",
+            "test_cases": [
+              "TC-ORDERS-API-022",
+              "TC-ORDERS-API-023",
+              "TC-ORDERS-API-024",
+              "TC-ORDERS-API-025"
+            ],
+            "test_types": [
+              "Authentication",
+              "Authorization",
+              "Negative",
+              "Positive"
+            ]
+          }
+        ],
+        "acceptance_criteria": [
+          {
+            "id": "AC-001.1",
+            "text": "Valid request returns 201 with an Order body",
+            "test_cases": [
+              "TC-ORDERS-API-001",
+              "TC-ORDERS-API-002"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "AC-001.2",
+            "text": "Invalid request returns 400 with an Error body (code, message, field)",
+            "test_cases": [
+              "TC-ORDERS-API-004",
+              "TC-ORDERS-API-005"
+            ],
+            "test_types": [
+              "Validation"
+            ]
+          },
+          {
+            "id": "AC-001.3",
+            "text": "Missing or invalid bearer token returns 401",
+            "test_cases": [
+              "TC-ORDERS-API-020",
+              "TC-ORDERS-API-021"
+            ],
+            "test_types": [
+              "Authentication"
+            ]
+          },
+          {
+            "id": "AC-001.4",
+            "text": "Out-of-stock items return 409 with an Error body and no order is created",
+            "test_cases": [
+              "TC-ORDERS-API-019"
+            ],
+            "test_types": [
+              "Negative"
+            ]
+          },
+          {
+            "id": "AC-002.1",
+            "text": "Existing own order returns 200 with the Order body",
+            "test_cases": [
+              "TC-ORDERS-API-022"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "AC-002.2",
+            "text": "Missing or invalid bearer token returns 401",
+            "test_cases": [
+              "TC-ORDERS-API-025"
+            ],
+            "test_types": [
+              "Authentication"
+            ]
+          },
+          {
+            "id": "AC-002.3",
+            "text": "Unknown order, or an order of another customer, returns 404",
+            "test_cases": [
+              "TC-ORDERS-API-023",
+              "TC-ORDERS-API-024"
+            ],
+            "test_types": [
+              "Authorization",
+              "Negative"
+            ]
+          }
+        ],
+        "business_rules": [
+          {
+            "id": "BR-001",
+            "text": "items and shippingAddressId are required",
+            "test_cases": [
+              "TC-ORDERS-API-004",
+              "TC-ORDERS-API-005"
+            ],
+            "test_types": [
+              "Validation"
+            ]
+          },
+          {
+            "id": "BR-002",
+            "text": "items has 1 to 20 entries (minItems 1, maxItems 20)",
+            "test_cases": [
+              "TC-ORDERS-API-006",
+              "TC-ORDERS-API-007",
+              "TC-ORDERS-API-008"
+            ],
+            "test_types": [
+              "Boundary"
+            ]
+          },
+          {
+            "id": "BR-003",
+            "text": "Each item requires productId (uuid) and quantity (integer 1-10)",
+            "test_cases": [
+              "TC-ORDERS-API-009",
+              "TC-ORDERS-API-010",
+              "TC-ORDERS-API-011",
+              "TC-ORDERS-API-012",
+              "TC-ORDERS-API-013",
+              "TC-ORDERS-API-014"
+            ],
+            "test_types": [
+              "Boundary",
+              "Validation"
+            ]
+          },
+          {
+            "id": "BR-004",
+            "text": "couponCode, when given, matches ^[A-Z0-9]{6,12}$",
+            "test_cases": [
+              "TC-ORDERS-API-002",
+              "TC-ORDERS-API-016",
+              "TC-ORDERS-API-017",
+              "TC-ORDERS-API-018"
+            ],
+            "test_types": [
+              "Boundary",
+              "Positive",
+              "Validation"
+            ]
+          },
+          {
+            "id": "BR-005",
+            "text": "On 201, stock is reserved for each item",
+            "test_cases": [
+              "TC-ORDERS-API-003"
+            ],
+            "test_types": [
+              "Business Rule"
+            ]
+          },
+          {
+            "id": "BR-006",
+            "text": "shippingAddressId is a uuid",
+            "test_cases": [
+              "TC-ORDERS-API-015"
+            ],
+            "test_types": [
+              "Validation"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,1009 @@
+{
+  "metadata": {
+    "suite_name": "ShopEase Engagement Release v2.4",
+    "created": "2026-10-06",
+    "input_types": [
+      "PRD"
+    ],
+    "analysis_file": "input-analysis.json"
+  },
+  "test_cases": [
+    {
+      "id": "TC-WISHLIST-001",
+      "source_refs": [
+        "FR-2.1"
+      ],
+      "feature": "Wishlist",
+      "scenario": "Add a product to the wishlist with the heart icon",
+      "test_type": "Positive",
+      "priority": "Critical",
+      "preconditions": [
+        "Customer asha@example.com is logged in",
+        "Wishlist is empty"
+      ],
+      "test_data": {
+        "product": "Blue Mug"
+      },
+      "steps": [
+        "Open the 'Blue Mug' product page",
+        "Click the empty heart icon",
+        "Open the wishlist page"
+      ],
+      "expected_result": "The heart icon becomes filled and the wishlist page lists 'Blue Mug'",
+      "assumption": false
+    },
+    {
+      "id": "TC-WISHLIST-002",
+      "source_refs": [
+        "FR-2.1"
+      ],
+      "feature": "Wishlist",
+      "scenario": "Remove a product by clicking the filled heart",
+      "test_type": "Positive",
+      "priority": "High",
+      "preconditions": [
+        "Customer asha@example.com is logged in",
+        "'Blue Mug' is in the wishlist"
+      ],
+      "test_data": {
+        "product": "Blue Mug"
+      },
+      "steps": [
+        "Open the 'Blue Mug' product page",
+        "Click the filled heart icon",
+        "Open the wishlist page"
+      ],
+      "expected_result": "The heart icon becomes empty and 'Blue Mug' is no longer on the wishlist page",
+      "assumption": false
+    },
+    {
+      "id": "TC-WISHLIST-003",
+      "source_refs": [
+        "FR-2.2"
+      ],
+      "feature": "Wishlist",
+      "scenario": "Add the 50th product to a wishlist holding 49",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Customer asha@example.com is logged in",
+        "Wishlist contains 49 products"
+      ],
+      "test_data": {
+        "existing_items": 49,
+        "product": "Product #50"
+      },
+      "steps": [
+        "Open the product page of 'Product #50'",
+        "Click the heart icon",
+        "Open the wishlist page"
+      ],
+      "expected_result": "The product is added and the wishlist page lists 50 products; no 'full' message is shown",
+      "assumption": false
+    },
+    {
+      "id": "TC-WISHLIST-004",
+      "source_refs": [
+        "FR-2.2"
+      ],
+      "feature": "Wishlist",
+      "scenario": "Adding a 51st product is rejected",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Customer asha@example.com is logged in",
+        "Wishlist contains 50 products"
+      ],
+      "test_data": {
+        "existing_items": 50,
+        "product": "Product #51"
+      },
+      "steps": [
+        "Open the product page of 'Product #51'",
+        "Click the heart icon",
+        "Open the wishlist page"
+      ],
+      "expected_result": "Message 'Your wishlist is full (50 items)' is shown, the heart stays empty and the wishlist still lists exactly 50 products",
+      "assumption": false
+    },
+    {
+      "id": "TC-WISHLIST-005",
+      "source_refs": [
+        "FR-2.3"
+      ],
+      "feature": "Wishlist",
+      "scenario": "Guest clicking the heart is redirected to login",
+      "test_type": "Authentication",
+      "priority": "High",
+      "preconditions": [
+        "User is not logged in"
+      ],
+      "test_data": {
+        "product": "Blue Mug"
+      },
+      "steps": [
+        "Open the 'Blue Mug' product page as a guest",
+        "Click the heart icon"
+      ],
+      "expected_result": "The browser navigates to the login page and the product is not added to any wishlist yet",
+      "assumption": false
+    },
+    {
+      "id": "TC-WISHLIST-006",
+      "source_refs": [
+        "FR-2.3"
+      ],
+      "feature": "Wishlist",
+      "scenario": "After logging in from the heart redirect, the product is added",
+      "test_type": "Integration",
+      "priority": "High",
+      "preconditions": [
+        "User is a guest who clicked the heart on 'Blue Mug' and is on the login page",
+        "Account asha@example.com has an empty wishlist"
+      ],
+      "test_data": {
+        "email": "asha@example.com",
+        "password": "Valid#Pass1",
+        "product": "Blue Mug"
+      },
+      "steps": [
+        "Log in with the credentials from test data",
+        "Open the wishlist page"
+      ],
+      "expected_result": "The wishlist of asha@example.com contains 'Blue Mug'",
+      "assumption": false
+    },
+    {
+      "id": "TC-WISHLIST-007",
+      "source_refs": [
+        "FR-2.4"
+      ],
+      "feature": "Wishlist",
+      "scenario": "Wishlist page shows the current price after a price change",
+      "test_type": "Business Rule",
+      "priority": "High",
+      "preconditions": [
+        "Customer asha@example.com is logged in",
+        "'Blue Mug' was added to the wishlist at ₹500",
+        "The price of 'Blue Mug' was then changed to ₹450"
+      ],
+      "test_data": {
+        "product": "Blue Mug",
+        "old_price": "₹500",
+        "current_price": "₹450"
+      },
+      "steps": [
+        "Open the wishlist page"
+      ],
+      "expected_result": "'Blue Mug' is listed with price ₹450 (not ₹500) and its stock status",
+      "assumption": false
+    },
+    {
+      "id": "TC-WISHLIST-008",
+      "source_refs": [
+        "FR-2.4"
+      ],
+      "feature": "Wishlist",
+      "scenario": "Wishlist page shows stock status for an out-of-stock product",
+      "test_type": "Edge Case",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer asha@example.com is logged in",
+        "'Red Lamp' is in the wishlist and its stock is 0"
+      ],
+      "test_data": {
+        "product": "Red Lamp",
+        "stock": 0
+      },
+      "steps": [
+        "Open the wishlist page"
+      ],
+      "expected_result": "'Red Lamp' is listed with an out-of-stock status and its current price",
+      "assumption": false
+    },
+    {
+      "id": "TC-WISHLIST-009",
+      "source_refs": [
+        "FR-2.4"
+      ],
+      "feature": "Wishlist",
+      "scenario": "Move a wishlist item to the cart",
+      "test_type": "Positive",
+      "priority": "High",
+      "preconditions": [
+        "Customer asha@example.com is logged in",
+        "'Blue Mug' (in stock) is in the wishlist",
+        "Cart is empty"
+      ],
+      "test_data": {
+        "product": "Blue Mug"
+      },
+      "steps": [
+        "Open the wishlist page",
+        "Use the move-to-cart action on 'Blue Mug'",
+        "Open the cart"
+      ],
+      "expected_result": "The cart contains 'Blue Mug'",
+      "assumption": false
+    },
+    {
+      "id": "TC-REVIEW-001",
+      "source_refs": [
+        "FR-3.1",
+        "FR-3.2"
+      ],
+      "feature": "Product Reviews",
+      "scenario": "Eligible customer submits a review with rating and text",
+      "test_type": "Positive",
+      "priority": "Critical",
+      "preconditions": [
+        "Customer asha@example.com is logged in and has a DELIVERED order containing 'Blue Mug'",
+        "asha has not reviewed 'Blue Mug'"
+      ],
+      "test_data": {
+        "rating": 5,
+        "text": "Great mug, keeps coffee hot."
+      },
+      "steps": [
+        "Open the 'Blue Mug' product page",
+        "Open the review form",
+        "Select 5 stars and enter `text`",
+        "Submit the review"
+      ],
+      "expected_result": "The review is saved and shown on the product page with 5 stars and the entered text",
+      "assumption": false
+    },
+    {
+      "id": "TC-REVIEW-002",
+      "source_refs": [
+        "FR-3.1"
+      ],
+      "feature": "Product Reviews",
+      "scenario": "Customer without an order of the product cannot review it",
+      "test_type": "Authorization",
+      "priority": "High",
+      "preconditions": [
+        "Customer ravi@example.com is logged in and has never ordered 'Blue Mug'"
+      ],
+      "test_data": {
+        "product": "Blue Mug"
+      },
+      "steps": [
+        "Open the 'Blue Mug' product page",
+        "Try to open the review form and submit a 4-star review"
+      ],
+      "expected_result": "No review from ravi@example.com is saved: the review form is unavailable or submission is refused, and the review count is unchanged",
+      "assumption": false
+    },
+    {
+      "id": "TC-REVIEW-003",
+      "source_refs": [
+        "FR-3.1"
+      ],
+      "feature": "Product Reviews",
+      "scenario": "Order not yet delivered does not allow a review",
+      "test_type": "Business Rule",
+      "priority": "High",
+      "preconditions": [
+        "Customer meera@example.com is logged in and her only order with 'Blue Mug' has status SHIPPED"
+      ],
+      "test_data": {
+        "order_status": "SHIPPED"
+      },
+      "steps": [
+        "Open the 'Blue Mug' product page",
+        "Try to open the review form and submit a 4-star review"
+      ],
+      "expected_result": "No review from meera@example.com is saved and the review count is unchanged",
+      "assumption": false
+    },
+    {
+      "id": "TC-REVIEW-004",
+      "source_refs": [
+        "FR-3.1"
+      ],
+      "feature": "Product Reviews",
+      "scenario": "Guest cannot submit a review",
+      "test_type": "Authorization",
+      "priority": "Medium",
+      "preconditions": [
+        "User is not logged in"
+      ],
+      "test_data": {
+        "product": "Blue Mug"
+      },
+      "steps": [
+        "Open the 'Blue Mug' product page as a guest",
+        "Try to submit a 4-star review"
+      ],
+      "expected_result": "No review is saved and the review count is unchanged",
+      "assumption": false
+    },
+    {
+      "id": "TC-REVIEW-005",
+      "source_refs": [
+        "FR-3.2"
+      ],
+      "feature": "Product Reviews",
+      "scenario": "Review without a star rating is rejected",
+      "test_type": "Validation",
+      "priority": "High",
+      "preconditions": [
+        "Customer asha@example.com is logged in and has a DELIVERED order containing 'Blue Mug'"
+      ],
+      "test_data": {
+        "rating": null,
+        "text": "No stars given"
+      },
+      "steps": [
+        "Open the review form for 'Blue Mug'",
+        "Enter `text` without selecting a rating",
+        "Submit the review"
+      ],
+      "expected_result": "The review is not saved and the rating is indicated as required; the review count is unchanged",
+      "assumption": false
+    },
+    {
+      "id": "TC-REVIEW-006",
+      "source_refs": [
+        "FR-3.2"
+      ],
+      "feature": "Product Reviews",
+      "scenario": "Rating-only review with 1 star (minimum) is accepted",
+      "test_type": "Boundary",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer asha@example.com is logged in and has a DELIVERED order containing 'Blue Mug'"
+      ],
+      "test_data": {
+        "rating": 1,
+        "text": ""
+      },
+      "steps": [
+        "Open the review form for 'Blue Mug'",
+        "Select 1 star and leave the text empty",
+        "Submit the review"
+      ],
+      "expected_result": "The review is saved and shown with 1 star and no text",
+      "assumption": false
+    },
+    {
+      "id": "TC-REVIEW-007",
+      "source_refs": [
+        "FR-3.2"
+      ],
+      "feature": "Product Reviews",
+      "scenario": "Review text of exactly 1000 characters is accepted",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Customer asha@example.com is logged in and has a DELIVERED order containing 'Blue Mug'"
+      ],
+      "test_data": {
+        "rating": 4,
+        "text_length": 1000
+      },
+      "steps": [
+        "Open the review form for 'Blue Mug'",
+        "Select 4 stars and paste a 1000-character text",
+        "Submit the review"
+      ],
+      "expected_result": "The review is saved and the displayed text contains all 1000 characters",
+      "assumption": false
+    },
+    {
+      "id": "TC-REVIEW-008",
+      "source_refs": [
+        "FR-3.2"
+      ],
+      "feature": "Product Reviews",
+      "scenario": "Review text of 1001 characters is not saved in full",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Customer asha@example.com is logged in and has a DELIVERED order containing 'Blue Mug'"
+      ],
+      "test_data": {
+        "rating": 4,
+        "text_length": 1001
+      },
+      "steps": [
+        "Open the review form for 'Blue Mug'",
+        "Select 4 stars and paste a 1001-character text",
+        "Submit the review"
+      ],
+      "expected_result": "No review with more than 1000 characters is stored: the field stops at 1000 characters or submission is refused with an error",
+      "assumption": false
+    },
+    {
+      "id": "TC-REVIEW-009",
+      "source_refs": [
+        "FR-3.3"
+      ],
+      "feature": "Product Reviews",
+      "scenario": "Second review for the same product is not allowed",
+      "test_type": "Business Rule",
+      "priority": "High",
+      "preconditions": [
+        "Customer asha@example.com is logged in and has a DELIVERED order containing 'Blue Mug'",
+        "asha already has a 5-star review on 'Blue Mug'"
+      ],
+      "test_data": {
+        "rating": 3
+      },
+      "steps": [
+        "Open the 'Blue Mug' product page",
+        "Try to submit a new 3-star review"
+      ],
+      "expected_result": "No second review is created; asha still has exactly one review on 'Blue Mug' and the total count is unchanged",
+      "assumption": false
+    },
+    {
+      "id": "TC-REVIEW-010",
+      "source_refs": [
+        "FR-3.3",
+        "FR-3.4"
+      ],
+      "feature": "Product Reviews",
+      "scenario": "Editing a review updates it and the average",
+      "test_type": "Positive",
+      "priority": "Medium",
+      "preconditions": [
+        "'Blue Mug' has exactly 3 reviews rated 4, 4 and 5; the 5-star review belongs to logged-in customer asha"
+      ],
+      "test_data": {
+        "old_rating": 5,
+        "new_rating": 2
+      },
+      "steps": [
+        "Open asha's review on 'Blue Mug'",
+        "Edit the rating from 5 to 2 and save",
+        "Reload the product page"
+      ],
+      "expected_result": "asha's review shows 2 stars, the review count is still 3, and the average shows 3.3",
+      "assumption": false
+    },
+    {
+      "id": "TC-REVIEW-011",
+      "source_refs": [
+        "FR-3.4"
+      ],
+      "feature": "Product Reviews",
+      "scenario": "Average rating is rounded to one decimal place with total count",
+      "test_type": "Business Rule",
+      "priority": "High",
+      "preconditions": [
+        "'Blue Mug' has exactly 3 reviews rated 4, 4 and 5"
+      ],
+      "test_data": {
+        "ratings": [
+          4,
+          4,
+          5
+        ],
+        "expected_average": "4.3"
+      },
+      "steps": [
+        "Open the 'Blue Mug' product page"
+      ],
+      "expected_result": "The product page shows average rating 4.3 and a total of 3 reviews",
+      "assumption": false
+    },
+    {
+      "id": "TC-COUPON-001",
+      "source_refs": [
+        "FR-4.1",
+        "FR-4.2"
+      ],
+      "feature": "Coupon Codes",
+      "scenario": "Percentage coupon is applied to the subtotal before shipping",
+      "test_type": "Positive",
+      "priority": "Critical",
+      "preconditions": [
+        "Customer is logged in and at checkout",
+        "Cart subtotal ₹1000, shipping ₹50",
+        "Coupon SAVE10 (10% off, min subtotal ₹500, not expired) exists"
+      ],
+      "test_data": {
+        "code": "SAVE10",
+        "subtotal": 1000,
+        "shipping": 50
+      },
+      "steps": [
+        "Enter coupon code `code`",
+        "Apply the coupon"
+      ],
+      "expected_result": "Discount ₹100 is applied, subtotal becomes ₹900, shipping stays ₹50 and the order total is ₹950",
+      "assumption": false
+    },
+    {
+      "id": "TC-COUPON-002",
+      "source_refs": [
+        "FR-4.2"
+      ],
+      "feature": "Coupon Codes",
+      "scenario": "Fixed-amount coupon is applied to the subtotal",
+      "test_type": "Positive",
+      "priority": "High",
+      "preconditions": [
+        "Customer is logged in and at checkout",
+        "Cart subtotal ₹1000, shipping ₹50",
+        "Coupon FLAT200 (₹200 off, min subtotal ₹500, not expired) exists"
+      ],
+      "test_data": {
+        "code": "FLAT200",
+        "subtotal": 1000,
+        "shipping": 50
+      },
+      "steps": [
+        "Enter coupon code `code`",
+        "Apply the coupon"
+      ],
+      "expected_result": "Discount ₹200 is applied, subtotal becomes ₹800 and the order total is ₹850",
+      "assumption": false
+    },
+    {
+      "id": "TC-COUPON-003",
+      "source_refs": [
+        "FR-4.1"
+      ],
+      "feature": "Coupon Codes",
+      "scenario": "Coupon code is accepted in lowercase",
+      "test_type": "Positive",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer is logged in and at checkout",
+        "Cart subtotal ₹1000",
+        "Coupon SAVE10 (10% off) exists"
+      ],
+      "test_data": {
+        "code": "save10"
+      },
+      "steps": [
+        "Enter coupon code `code`",
+        "Apply the coupon"
+      ],
+      "expected_result": "SAVE10 is applied and the subtotal becomes ₹900",
+      "assumption": false
+    },
+    {
+      "id": "TC-COUPON-004",
+      "source_refs": [
+        "FR-4.1"
+      ],
+      "feature": "Coupon Codes",
+      "scenario": "Only one coupon can be applied to an order",
+      "test_type": "Business Rule",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer is logged in and at checkout",
+        "Cart subtotal ₹1000",
+        "Coupons SAVE10 and FLAT200 exist",
+        "SAVE10 is already applied"
+      ],
+      "test_data": {
+        "second_code": "FLAT200"
+      },
+      "steps": [
+        "Enter `second_code`",
+        "Apply the coupon",
+        "Review the order summary"
+      ],
+      "expected_result": "The order summary shows exactly one coupon discount (either SAVE10 or FLAT200, never both combined)",
+      "assumption": false
+    },
+    {
+      "id": "TC-COUPON-005",
+      "source_refs": [
+        "FR-4.3"
+      ],
+      "feature": "Coupon Codes",
+      "scenario": "Expired coupon is rejected",
+      "test_type": "Negative",
+      "priority": "High",
+      "preconditions": [
+        "Customer is logged in and at checkout",
+        "Cart subtotal ₹1000",
+        "Coupon OLD10 expired yesterday"
+      ],
+      "test_data": {
+        "code": "OLD10"
+      },
+      "steps": [
+        "Enter coupon code `code`",
+        "Apply the coupon"
+      ],
+      "expected_result": "Message 'This coupon has expired' is shown and the subtotal stays ₹1000",
+      "assumption": false
+    },
+    {
+      "id": "TC-COUPON-006",
+      "source_refs": [
+        "FR-4.3"
+      ],
+      "feature": "Coupon Codes",
+      "scenario": "Coupon expiring tomorrow is still accepted",
+      "test_type": "Boundary",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer is logged in and at checkout",
+        "Cart subtotal ₹1000",
+        "Coupon SOON10 (10% off) expires tomorrow"
+      ],
+      "test_data": {
+        "code": "SOON10"
+      },
+      "steps": [
+        "Enter coupon code `code`",
+        "Apply the coupon"
+      ],
+      "expected_result": "SOON10 is applied and the subtotal becomes ₹900",
+      "assumption": false
+    },
+    {
+      "id": "TC-COUPON-007",
+      "source_refs": [
+        "FR-4.3"
+      ],
+      "feature": "Coupon Codes",
+      "scenario": "Subtotal ₹1 below the coupon minimum is rejected",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Customer is logged in and at checkout",
+        "Cart subtotal ₹499",
+        "Coupon SAVE10 has minimum subtotal ₹500"
+      ],
+      "test_data": {
+        "code": "SAVE10",
+        "subtotal": 499,
+        "minimum": 500
+      },
+      "steps": [
+        "Enter coupon code `code`",
+        "Apply the coupon"
+      ],
+      "expected_result": "Message 'Add ₹1 more to use this coupon' is shown and the subtotal stays ₹499",
+      "assumption": false
+    },
+    {
+      "id": "TC-COUPON-008",
+      "source_refs": [
+        "FR-4.3"
+      ],
+      "feature": "Coupon Codes",
+      "scenario": "Subtotal exactly at the coupon minimum is accepted",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Customer is logged in and at checkout",
+        "Cart subtotal ₹500",
+        "Coupon SAVE10 has minimum subtotal ₹500"
+      ],
+      "test_data": {
+        "code": "SAVE10",
+        "subtotal": 500,
+        "minimum": 500
+      },
+      "steps": [
+        "Enter coupon code `code`",
+        "Apply the coupon"
+      ],
+      "expected_result": "SAVE10 is applied and the subtotal becomes ₹450",
+      "assumption": false
+    },
+    {
+      "id": "TC-COUPON-009",
+      "source_refs": [
+        "FR-4.4"
+      ],
+      "feature": "Coupon Codes",
+      "scenario": "Fixed discount larger than the subtotal does not make it negative",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Customer is logged in and at checkout",
+        "Cart subtotal ₹200",
+        "Coupon FLAT300 (₹300 off, no minimum above ₹200, not expired) exists"
+      ],
+      "test_data": {
+        "code": "FLAT300",
+        "subtotal": 200
+      },
+      "steps": [
+        "Enter coupon code `code`",
+        "Apply the coupon",
+        "Review the order summary"
+      ],
+      "expected_result": "The subtotal after discount is not negative (≥ ₹0) and the order total is never below the shipping amount",
+      "assumption": false
+    },
+    {
+      "id": "TC-COUPON-010",
+      "source_refs": [
+        "FR-4.4"
+      ],
+      "feature": "Coupon Codes",
+      "scenario": "Fixed discount equal to the subtotal brings it to exactly zero",
+      "test_type": "Boundary",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer is logged in and at checkout",
+        "Cart subtotal ₹200",
+        "Coupon FLAT200 (₹200 off, min subtotal ≤ ₹200) exists"
+      ],
+      "test_data": {
+        "code": "FLAT200",
+        "subtotal": 200
+      },
+      "steps": [
+        "Enter coupon code `code`",
+        "Apply the coupon"
+      ],
+      "expected_result": "The subtotal after discount is ₹0 and only shipping remains in the total",
+      "assumption": false
+    },
+    {
+      "id": "TC-COUPON-011",
+      "source_refs": [
+        "FR-4.1"
+      ],
+      "feature": "Coupon Codes",
+      "scenario": "Unknown coupon code is not applied",
+      "test_type": "Negative",
+      "priority": "Medium",
+      "preconditions": [
+        "Customer is logged in and at checkout",
+        "Cart subtotal ₹1000",
+        "No coupon named NOPE123 exists"
+      ],
+      "test_data": {
+        "code": "NOPE123"
+      },
+      "steps": [
+        "Enter coupon code `code`",
+        "Apply the coupon"
+      ],
+      "expected_result": "The coupon is rejected with an error message and the subtotal stays ₹1000",
+      "assumption": true,
+      "assumption_refs": [
+        "A-1"
+      ]
+    }
+  ],
+  "coverage_summary": {
+    "gaps": [
+      {
+        "description": "Wishlist page load performance ('should load quickly')",
+        "reason": "No measurable target (Q-5); not testable as stated"
+      },
+      {
+        "description": "Coupon validity on the expiry date itself",
+        "reason": "Not specified (Q-2); day-before and day-after are tested"
+      },
+      {
+        "description": "Move-to-cart side effects on the wishlist and for out-of-stock items",
+        "reason": "Not specified (Q-3)"
+      },
+      {
+        "description": "Product page with zero reviews",
+        "reason": "Not specified (Q-4)"
+      },
+      {
+        "description": "Wishlist sharing and review moderation",
+        "reason": "Out of scope per PRD §1.2"
+      },
+      {
+        "ref": "FR-2.1",
+        "description": "No negative case for heart add/remove",
+        "reason": "FR-2.1 defines no failure behaviour; the limit and guest paths are covered under FR-2.2/FR-2.3"
+      },
+      {
+        "ref": "FR-4.2",
+        "description": "No separate negative case for discount application",
+        "reason": "Rejection paths for coupons are covered under FR-4.1 (unknown code), FR-4.3 (expiry/minimum) and FR-4.4"
+      }
+    ],
+    "notes": "All 12 functional requirements across Wishlist, Reviews and Coupons are covered, including boundaries at 50/51 wishlist items, 1000/1001 review characters, the coupon minimum subtotal and discounts at or above the subtotal. The non-functional 'load quickly' statement is reported as a gap because it has no target. Open questions Q-2..Q-4 leave expiry-day, move-to-cart and empty-review behaviour untested.",
+    "computed": {
+      "total_test_cases": 31,
+      "positive": 8,
+      "negative": 2,
+      "boundary": 10,
+      "edge": 1,
+      "validation": 1,
+      "by_type": {
+        "Authentication": 1,
+        "Authorization": 2,
+        "Boundary": 10,
+        "Business Rule": 5,
+        "Edge Case": 1,
+        "Integration": 1,
+        "Negative": 2,
+        "Positive": 8,
+        "Validation": 1
+      },
+      "by_priority": {
+        "Critical": 3,
+        "High": 19,
+        "Medium": 9
+      },
+      "assumption_based": 1,
+      "requirements_identified": 12,
+      "acceptance_criteria_identified": 0,
+      "business_rules_identified": 0,
+      "requirements_covered": 12,
+      "acceptance_criteria_covered": 0,
+      "business_rules_covered": 0,
+      "uncovered": {
+        "requirements": [],
+        "acceptance_criteria": [],
+        "business_rules": []
+      },
+      "requirements_without_negative": [
+        "FR-2.1",
+        "FR-4.2"
+      ],
+      "traceability": {
+        "requirements": [
+          {
+            "id": "FR-2.1",
+            "text": "Customer adds a product to the wishlist with the heart icon; clicking the filled heart removes it",
+            "test_cases": [
+              "TC-WISHLIST-001",
+              "TC-WISHLIST-002"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "FR-2.2",
+            "text": "Wishlist holds at most 50 products; adding a 51st shows 'Your wishlist is full (50 items)'",
+            "test_cases": [
+              "TC-WISHLIST-003",
+              "TC-WISHLIST-004"
+            ],
+            "test_types": [
+              "Boundary"
+            ]
+          },
+          {
+            "id": "FR-2.3",
+            "text": "Guest clicking the heart is redirected to login and the product is added after logging in",
+            "test_cases": [
+              "TC-WISHLIST-005",
+              "TC-WISHLIST-006"
+            ],
+            "test_types": [
+              "Authentication",
+              "Integration"
+            ]
+          },
+          {
+            "id": "FR-2.4",
+            "text": "Wishlist page lists products with current price and stock status and lets the customer move an item to the cart",
+            "test_cases": [
+              "TC-WISHLIST-007",
+              "TC-WISHLIST-008",
+              "TC-WISHLIST-009"
+            ],
+            "test_types": [
+              "Business Rule",
+              "Edge Case",
+              "Positive"
+            ]
+          },
+          {
+            "id": "FR-3.1",
+            "text": "Only customers with a delivered order containing the product can review it",
+            "test_cases": [
+              "TC-REVIEW-001",
+              "TC-REVIEW-002",
+              "TC-REVIEW-003",
+              "TC-REVIEW-004"
+            ],
+            "test_types": [
+              "Authorization",
+              "Business Rule",
+              "Positive"
+            ]
+          },
+          {
+            "id": "FR-3.2",
+            "text": "A review has a required 1-5 star rating and optional text up to 1000 characters",
+            "test_cases": [
+              "TC-REVIEW-001",
+              "TC-REVIEW-005",
+              "TC-REVIEW-006",
+              "TC-REVIEW-007",
+              "TC-REVIEW-008"
+            ],
+            "test_types": [
+              "Boundary",
+              "Positive",
+              "Validation"
+            ]
+          },
+          {
+            "id": "FR-3.3",
+            "text": "One review per customer per product; it can be edited afterwards",
+            "test_cases": [
+              "TC-REVIEW-009",
+              "TC-REVIEW-010"
+            ],
+            "test_types": [
+              "Business Rule",
+              "Positive"
+            ]
+          },
+          {
+            "id": "FR-3.4",
+            "text": "Product page shows the average rating rounded to one decimal and the total number of reviews",
+            "test_cases": [
+              "TC-REVIEW-010",
+              "TC-REVIEW-011"
+            ],
+            "test_types": [
+              "Business Rule",
+              "Positive"
+            ]
+          },
+          {
+            "id": "FR-4.1",
+            "text": "Customer can enter one coupon code at checkout; codes are case-insensitive",
+            "test_cases": [
+              "TC-COUPON-001",
+              "TC-COUPON-003",
+              "TC-COUPON-004",
+              "TC-COUPON-011"
+            ],
+            "test_types": [
+              "Business Rule",
+              "Negative",
+              "Positive"
+            ]
+          },
+          {
+            "id": "FR-4.2",
+            "text": "A valid coupon applies its percentage or fixed discount to the subtotal before shipping",
+            "test_cases": [
+              "TC-COUPON-001",
+              "TC-COUPON-002"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "FR-4.3",
+            "text": "Coupons have an expiry date and a minimum subtotal with messages 'This coupon has expired' / 'Add ₹<amount> more to use this coupon'",
+            "test_cases": [
+              "TC-COUPON-005",
+              "TC-COUPON-006",
+              "TC-COUPON-007",
+              "TC-COUPON-008"
+            ],
+            "test_types": [
+              "Boundary",
+              "Negative"
+            ]
+          },
+          {
+            "id": "FR-4.4",
+            "text": "The discount can never make the order subtotal negative",
+            "test_cases": [
+              "TC-COUPON-009",
+              "TC-COUPON-010"
+            ],
+            "test_types": [
+              "Boundary"
+            ]
+          }
+        ],
+        "acceptance_criteria": [],
+        "business_rules": []
+      }
+    }
+  }
+}

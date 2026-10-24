@@ -1,0 +1,47 @@
+Test Case ID,Source Refs,Feature,Scenario,Test Type,Priority,Preconditions,Test Data,Test Steps,Expected Result,Postconditions,Assumption,Assumption Refs,Origin,Notes
+TC-HOME-001,"REQ-001, REQ-004",Homepage,Guest opens the homepage and sees the 'Sign in' link,Positive,Critical,User is not logged in (fresh browser session),url: /,1. Open the store root URL '/',"Homepage loads with header (logo, search bar, cart icon, 'Sign in' link), hero carousel, Featured Products grid and footer; no 'Hi, ' greeting is shown",,No,,,
+TC-HOME-002,REQ-004,Homepage,"Logged-in customer sees 'Hi, <first name>' instead of 'Sign in'",Positive,High,"Customer account with first name 'Asha' exists
+Customer is logged in",first_name: Asha,"1. Open '/'
+2. Look at the right side of the header","Header shows 'Hi, Asha' and the 'Sign in' link is not displayed",,No,,,
+TC-HOME-003,REQ-002,Homepage,Logo returns to the homepage from another page,Positive,Medium,"User is on a page other than the homepage, e.g. /search?q=shoes",start_url: /search?q=shoes,1. Click the ShopEase logo in the header,Browser navigates to '/' and the homepage content is displayed,,No,,,
+TC-HOME-004,REQ-003,Homepage,Cart icon shows the number of items in the cart,Positive,High,Cart contains 3 items,cart_items: 3,"1. Open '/'
+2. Look at the cart icon in the header",Cart icon shows the count 3,,No,,,
+TC-HOME-005,AC-005.1,Homepage,Carousel rotates to the next banner every 6 seconds,UI,Medium,"3 active promotions exist (banners B1, B2, B3)",banners: B1; B2; B3; interval_seconds: 6,"1. Open '/' and note the visible banner (B1)
+2. Wait 6 seconds without interacting
+3. Wait another 6 seconds",B2 becomes visible about 6 seconds after load and B3 about 12 seconds after load; no banner changes earlier than 6 seconds,,No,,,
+TC-HOME-006,AC-005.2,Homepage,Right and left arrows move between banners,UI,Medium,"3 active promotions exist (banners B1, B2, B3)",banners: B1; B2; B3,"1. Open '/' while B1 is visible
+2. Click the right arrow
+3. Click the left arrow",After the right arrow B2 is shown; after the left arrow B1 is shown again,,No,,,
+TC-HOME-007,AC-005.3,Homepage,Clicking a banner opens its promotion page,Positive,High,Active promotion 'Diwali Sale' with promotion page /promo/diwali-sale,banner: Diwali Sale; target: /promo/diwali-sale,"1. Open '/'
+2. Navigate the carousel to the 'Diwali Sale' banner
+3. Click the banner","Browser navigates to /promo/diwali-sale, the configured page of that promotion",,No,,,
+TC-HOME-008,BR-001,Homepage,Carousel shows at most 5 banners when 6 promotions are active,Boundary,Medium,6 active promotions exist,active_promotions: 6; max_banners: 5,"1. Open '/'
+2. Click the right arrow repeatedly, counting distinct banners until the first banner reappears or the arrow stops advancing",Exactly 5 distinct banners are reachable in the carousel,,No,,,
+TC-HOME-009,BR-001,Homepage,Carousel shows all 5 banners when exactly 5 promotions are active,Boundary,Low,Exactly 5 active promotions exist,active_promotions: 5,"1. Open '/'
+2. Click the right arrow, counting distinct banners until the first banner reappears or the arrow stops advancing","All 5 promotion banners are reachable, none missing",,No,,,
+TC-HOME-010,BR-002,Homepage,Carousel is hidden when there are no active promotions,Edge Case,Medium,All promotions are inactive or expired,active_promotions: 0,1. Open '/',"No carousel area, arrows or empty placeholder are displayed; the Featured Products grid follows the header directly",,No,,,
+TC-HOME-011,"AC-006.1, BR-003",Homepage,Featured Products grid shows 8 complete product cards,Positive,High,"At least 8 in-stock products are marked as featured
+Desktop viewport 1280px wide",featured_products: 8; viewport_px: 1280,"1. Open '/'
+2. Scroll to the 'Featured Products' section
+3. Inspect each product card","Exactly 8 cards are shown in rows of 4; each card shows the product image, name, price and an 'Add to cart' button",,No,,,
+TC-HOME-012,AC-006.2,Homepage,Out-of-stock featured product shows 'Out of stock' instead of 'Add to cart',Business Rule,High,Featured product 'Blue Mug' has stock 0,product: Blue Mug; stock: 0,"1. Open '/'
+2. Find the 'Blue Mug' card in the Featured Products grid","The card shows an 'Out of stock' label and no 'Add to cart' button; image, name and price are still shown",,No,,,
+TC-HOME-013,"AC-007.1, BR-004",Homepage,Search with exactly 2 characters using Enter opens the results page,Boundary,High,User is on '/',term: tv,"1. Type 'tv' in the search bar
+2. Press Enter",Browser navigates to /search?q=tv,,No,,,
+TC-HOME-014,AC-007.2,Homepage,Search using the search icon opens the results page,Positive,High,User is on '/',term: running shoes,"1. Type 'running shoes' in the search bar
+2. Click the search icon",Browser navigates to /search?q=running%20shoes (or running+shoes) and the term is preserved,,No,,,
+TC-HOME-015,BR-004,Homepage,Search with 1 character is not submitted,Boundary,Medium,User is on '/',term: t,"1. Type 't' in the search bar
+2. Press Enter
+3. Click the search icon",The URL stays '/' and the results page is not opened after either action,,Yes,A-1,,
+TC-HOME-016,BR-004,Homepage,Empty search is not submitted,Validation,Low,User is on '/',term: ,"1. Leave the search bar empty
+2. Click the search icon",The URL stays '/' and the results page is not opened,,Yes,A-1,,
+TC-HOME-017,REQ-008,Homepage,"Footer links open About Us, Contact, Privacy Policy and Terms of Service",Positive,Low,User is on '/',links: About Us; Contact; Privacy Policy; Terms of Service,"1. Scroll to the footer
+2. Click each link in test data, returning to '/' after each",All 4 links are present and each opens the page whose title matches the link text,,No,,,
+TC-HOME-018,AC-009.1,Homepage,Featured grid shows 2 products per row at 480px,Compatibility,Medium,At least 8 featured products,viewport_px: 480,"1. Set the browser viewport width to 480px
+2. Open '/'
+3. Scroll to the Featured Products grid",Products are laid out 2 per row (4 rows of 2) with no horizontal scrolling,,No,,,
+TC-HOME-019,AC-009.1,Homepage,Featured grid shows 4 products per row at 481px,Boundary,Low,At least 8 featured products,viewport_px: 481,"1. Set the browser viewport width to 481px
+2. Open '/'
+3. Scroll to the Featured Products grid",Products are laid out 4 per row (2 rows of 4),,No,,,
+TC-HOME-020,REQ-003,Homepage,Cart icon with an empty cart shows a count of 0 or no count badge,Edge Case,Low,Cart is empty,cart_items: 0,"1. Open '/'
+2. Look at the cart icon in the header",Cart icon does not show a non-zero number (shows 0 or no badge) and no stale count from a previous session is displayed,,No,,,

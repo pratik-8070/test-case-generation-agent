@@ -1,0 +1,9 @@
+{
+  "example": "resources/examples/homepage.md",
+  "input_types": ["FEATURE_DESCRIPTION"],
+  "min_requirements": 6,
+  "test_case_range": [12, 40],
+  "required_test_types": ["Positive", "UI"],
+  "must_mention": ["/search?q=", "Out of stock", "Hi, ", "6 seconds", "480"],
+  "must_not_mention": ["newsletter", "chatbot"]
+}

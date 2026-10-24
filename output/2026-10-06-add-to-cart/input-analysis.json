@@ -1,0 +1,37 @@
+{
+  "metadata": {"run_id": "2026-10-06-add-to-cart", "created": "2026-10-06"},
+  "inputs": [
+    {
+      "source": "resources/examples/add-to-cart.md",
+      "input_type": "ACCEPTANCE_CRITERIA",
+      "confidence": "high",
+      "evidence": ["Title 'Feature: Add to Cart — Acceptance Criteria'", "Six Given/When/Then criteria AC-CART-1..6 with no story or narrative"]
+    }
+  ],
+  "features": [{"code": "CART", "name": "Add to Cart", "source_ref": "add-to-cart.md title"}],
+  "requirements": [
+    {"id": "REQ-001", "feature": "CART", "text": "A shopper can add a product to the cart from the product detail page", "source_ref": "add-to-cart.md title + AC-CART-1", "origin": "stated",
+     "details": {"user_roles": ["Logged-in shopper", "Guest shopper"], "inputs": ["quantity (whole number 1-10)"], "boundary_conditions": ["quantity 1-10", "cart line max 10", "available stock"]}}
+  ],
+  "acceptance_criteria": [
+    {"id": "AC-CART-1", "requirement_id": "REQ-001", "text": "Adding an in-stock product adds it with quantity 1, increments the cart icon count by 1 and shows toast 'Added to cart'", "source_ref": "AC-CART-1", "origin": "stated"},
+    {"id": "AC-CART-2", "requirement_id": "REQ-001", "text": "Adding a product already in the cart increases the existing line's quantity by 1 instead of creating a new line", "source_ref": "AC-CART-2", "origin": "stated"},
+    {"id": "AC-CART-3", "requirement_id": "REQ-001", "text": "Selected quantity must be a whole number between 1 and 10 inclusive", "source_ref": "AC-CART-3", "origin": "stated"},
+    {"id": "AC-CART-4", "requirement_id": "REQ-001", "text": "Adding to a line with quantity 10 shows 'You can buy a maximum of 10 units of this item' and the quantity stays 10", "source_ref": "AC-CART-4", "origin": "stated"},
+    {"id": "AC-CART-5", "requirement_id": "REQ-001", "text": "Requesting more than the available stock shows 'Only <n> left in stock' and nothing is added", "source_ref": "AC-CART-5", "origin": "stated"},
+    {"id": "AC-CART-6", "requirement_id": "REQ-001", "text": "A guest's items are stored in a guest cart and merged into the account cart on login", "source_ref": "AC-CART-6", "origin": "stated"}
+  ],
+  "business_rules": [
+    {"id": "BR-001", "requirement_id": "REQ-001", "text": "An add that would take a cart line above 10 units is rejected with the maximum message and the line keeps its quantity", "source_ref": "inferred from AC-CART-3 + AC-CART-4", "origin": "inferred"}
+  ],
+  "clarifications": [
+    {"id": "Q-1", "question": "If a line has quantity 8 and the shopper adds 3 more, is the add rejected, capped at 10, or allowed?", "why": "AC-CART-4 only covers a line already at 10.", "severity": "non_blocking", "related_refs": ["AC-CART-4", "BR-001"], "status": "assumed"},
+    {"id": "Q-2", "question": "How is an invalid quantity (0, 11, 2.5, empty) rejected: the selector prevents it, or an error message is shown?", "why": "AC-CART-3 states the range but not the rejection behaviour or message.", "severity": "non_blocking", "related_refs": ["AC-CART-3"], "status": "assumed"},
+    {"id": "Q-3", "question": "When the guest cart and account cart contain the same product, are quantities summed, and is the 10-unit cap applied?", "why": "AC-CART-6 states merging but not the conflict rule.", "severity": "non_blocking", "related_refs": ["AC-CART-6"], "status": "out_of_scope"},
+    {"id": "Q-4", "question": "Does the cart icon count total units or distinct lines (e.g. after AC-CART-2)?", "why": "AC-CART-1 says +1 for a new product; behaviour on quantity increase is unstated.", "severity": "non_blocking", "related_refs": ["AC-CART-1", "AC-CART-2"], "status": "out_of_scope"}
+  ],
+  "assumptions": [
+    {"id": "A-1", "text": "An add that would exceed 10 units on a line is rejected with 'You can buy a maximum of 10 units of this item' and the line quantity is unchanged.", "related_refs": ["BR-001"], "from_clarification": "Q-1"},
+    {"id": "A-2", "text": "Quantities outside 1-10 or non-whole numbers cannot be added: the cart is unchanged (message text unspecified).", "related_refs": ["AC-CART-3"], "from_clarification": "Q-2"}
+  ]
+}

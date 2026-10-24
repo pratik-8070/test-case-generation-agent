@@ -1,0 +1,53 @@
+Test Case ID,Source Refs,Feature,Scenario,Test Type,Priority,Preconditions,Test Data,Test Steps,Expected Result,Postconditions,Assumption,Assumption Refs,Origin,Notes
+TC-LISTING-001,"FR-1, AC-01, BR-01",Create Listing Common Flow,Select Standard listing type at step 1 and verify type immutability after publish -> Navigates to common item details with Standard configuration and prevents post-publish type change,Positive,Critical,Seller is logged in and verified,selected_type: Standard,"1. Navigate to Create Listing flow
+2. Verify type selector displays Standard with one-line description and eligibility status
+3. Select 'Standard' type, complete listing and publish
+4. Attempt to edit published listing type","User proceeds to Step 2 with Standard flow initialized, and published listing type is immutable per BR-01.",,No,,,
+TC-LISTING-002,"FR-2, AC-02",Create Listing Common Flow,View ineligible Luxury listing type -> Type is disabled with reason and qualification instructions,Validation,High,Seller has KYC complete but only 4 completed orders (< 10 required),seller_orders: 4,"1. Navigate to Create Listing flow
+2. Observe Luxury listing type card on Step 1","Luxury card is visually disabled, showing text 'Needs KYC and 10+ completed orders (you have 4)' and radio/selection is unclickable.",,No,,,
+TC-LISTING-003,"FR-3, AC-03",Create Listing Common Flow,Draft auto-save triggers -> Draft is saved every 10s and on step change,Positive,High,Seller is on Step 2 (Item details),title: Sony WH-1000XM5 headphones,"1. Enter valid title 'Sony WH-1000XM5 headphones'
+2. Wait for 10 seconds without interacting, or tap 'Next'/'Save draft'
+3. Close browser/app and reopen draft",Indicator displays 'Draft saved just now' and reopened draft restores entered title and form state correctly.,,No,,,
+TC-LISTING-004,BR-05,Create Listing Common Flow,Enter Title below minimum boundary -> Inline validation error shown,Boundary,High,Seller is on Step 2 (Item details),title: Short,"1. Enter title with 9 characters ('Short 12')
+2. Blur field or attempt to proceed","Inline validation error appears indicating title must be between 10 and 80 characters, and progression is blocked.",,No,,,
+TC-LISTING-005,BR-05,Create Listing Common Flow,Enter Title at exact minimum boundary -> Validation passes,Boundary,Medium,Seller is on Step 2 (Item details),title: Sony WH-10,"1. Enter title with exactly 10 characters ('Sony WH-10')
+2. Blur field",No validation error is shown for the title field.,,No,,,
+TC-LISTING-006,BR-05,Create Listing Common Flow,Enter Title at exact maximum boundary -> Validation passes,Boundary,Medium,Seller is on Step 2 (Item details),title: 12345678901234567890123456789012345678901234567890123456789012345678901234567800,"1. Enter title with exactly 80 characters
+2. Blur field",No validation error is shown for the title field.,,No,,,
+TC-LISTING-007,BR-05,Create Listing Common Flow,Enter Title above maximum boundary -> Inline validation error shown,Boundary,High,Seller is on Step 2 (Item details),title: 123456789012345678901234567890123456789012345678901234567890123456789012345678001,"1. Enter title with 81 characters
+2. Blur field",Inline validation error appears indicating title cannot exceed 80 characters.,,No,,,
+TC-LISTING-008,BR-05,Create Listing Common Flow,Enter Description below minimum boundary -> Inline validation error shown,Boundary,High,Seller is on Step 2 (Item details),description: Too short description under fifty characters.,"1. Enter description with 49 characters
+2. Blur field",Inline validation error appears 'Min 50 characters'.,,No,,,
+TC-LISTING-009,BR-05,Create Listing Common Flow,Enter Description at exact minimum boundary -> Validation passes,Boundary,Medium,Seller is on Step 2 (Item details),description: 12345678901234567890123456789012345678901234567890,"1. Enter description with exactly 50 characters
+2. Blur field",No validation error is shown for description.,,No,,,
+TC-LISTING-010,BR-05,Create Listing Common Flow,Enter Description at exact maximum boundary -> Validation passes,Boundary,Medium,Seller is on Step 2 (Item details),description: Valid 2000 character long description text body.,"1. Enter description with exactly 2000 characters
+2. Blur field",No validation error is shown for description.,,No,,,
+TC-LISTING-011,BR-05,Create Listing Common Flow,Enter Description above maximum boundary -> Inline validation error shown,Boundary,High,Seller is on Step 2 (Item details),description: Too long description over 2000 characters.,"1. Enter description with 2001 characters
+2. Blur field",Inline validation error appears indicating description cannot exceed 2000 characters.,,No,,,
+TC-LISTING-012,"FR-13, AC-10",Create Listing Common Flow,Preview listing as buyer -> Preview screen renders listing exactly as buyer sees it,Positive,Critical,Seller has filled out all required common and type-specific fields,type: Standard; title: Sony WH-1000XM5 headphones; price: 18500,"1. Complete all steps up to Step 4 (Preview)
+2. Review preview screen layout and elements","Preview screen renders photos, title, price, category, condition, and returns policy matching the published buyer view.",,No,,,
+TC-LISTING-013,FR-14,Create Listing Common Flow,"Publish listing successfully -> Confirmation displays listing ID, status, and link",Positive,Critical,Seller is on Step 4 (Preview),,1. Tap 'Publish' button,"Confirmation screen displays listing ID (e.g., LST-8F3K2Q), Status 'Live', and a link/button 'View listing'.",,No,,,
+TC-BUYER-PROT-001,"FR-4, AC-09",Buyer Protection Listing Type,"Configure Buyer Protection listing -> Protection fee, payout timeline, and tracked shipping shown",Positive,Critical,Seller selected Buyer Protection listing type,price: 18500,"1. Proceed to Step 3 (Type settings) for Buyer Protection
+2. Enter price Rs. 18,500
+3. Verify protection fee calculation, total buyer price, payout timeline, and tracked shipping toggle","Protection fee displays Rs. 370, Buyer pays Rs. 18,870, You receive Rs. 18,500, payout timeline is explained, and tracked shipping toggle is enabled.",,No,,,
+TC-BUYER-PROT-002,"FR-5, AC-09",Buyer Protection Listing Type,Publish Buyer Protection listing -> Buyer Protection badge appears on card and detail page,Positive,High,Buyer Protection listing published successfully,,1. Navigate to listing card in search results and listing detail page as a buyer,Green 'Buyer Protection' badge is visibly rendered on both the listing card and detail page.,,No,,,
+TC-LUXURY-001,"FR-6, BR-02, AC-04",Luxury Listing Type,"Enter Luxury listing price below Rs. 50,000 -> Inline validation error blocks publishing",Boundary,Critical,Seller selected Luxury listing type and reached Step 3,price: 42000,"1. Enter price Rs. 42,000
+2. Blur field or attempt to proceed","Inline error displays 'Luxury listings must be Rs. 50,000 or more' in red, and progression/publishing is blocked.",,No,,,
+TC-LUXURY-002,"FR-6, BR-02",Luxury Listing Type,"Enter Luxury listing price at exact minimum Rs. 50,000 -> Validation passes",Boundary,High,Seller selected Luxury listing type and reached Step 3,price: 50000,"1. Enter price Rs. 50,000
+2. Blur field",No validation error is shown for the price field.,,No,,,
+TC-LUXURY-003,FR-7,Luxury Listing Type,Upload proof of purchase and required photos for Luxury listing -> Photos and document accepted,Positive,High,Seller is on Luxury authentication step,brand: Rolex; model: Datejust 41; serial: XXXX4821,"1. Enter Brand, Model, and Serial Number
+2. Upload invoice PDF/JPG
+3. Check required photo boxes (Front and back, Logo close-up, Serial number close-up, Box and papers)",All documents and required photo selections upload successfully without errors.,,No,,,
+TC-LUXURY-004,"FR-8, AC-05",Luxury Listing Type,Publish valid Luxury listing -> Status set to Pending Review with authentication notice,Positive,Critical,"Valid Luxury listing completed with price >= Rs. 50,000 and authentication details",,1. Tap Publish on preview screen,Listing status becomes 'Pending Review' with message 'Sent for authentication. Most checks finish within 48 hours'.,,No,,,
+TC-OM-001,"FR-9, BR-03",Offer Mode Listing Type,Enter Minimum offer greater than Asking price -> Inline validation error blocks publishing,Validation,High,Seller selected OM (Offer Mode) listing type and reached Step 3,askingPrice: 22000; minOffer: 24000,"1. Enter Asking price Rs. 22,000
+2. Enter Minimum offer Rs. 24,000
+3. Blur field or attempt to proceed","Inline validation error appears: 'Must be less than or equal to the asking price', and publishing is blocked.",,No,,,
+TC-OM-002,"FR-10, AC-07",Offer Mode Listing Type,Receive offer below minimum offer threshold -> System auto-declines offer,Business Rule,High,"OM listing published with asking price Rs. 22,000 and hidden minimum offer Rs. 18,000",incomingOffer: 17000,"1. Buyer submits offer of Rs. 17,000
+2. System evaluates offer against configured minimum offer",Offer is automatically declined by the system without disturbing the seller.,,No,,,
+TC-OM-003,"FR-9, AC-06",Offer Mode Listing Type,Inspect buyer-facing API response and web page for OM listing -> Hidden minimum offer is absent,Security,Critical,OM listing with hidden minimum offer is live,,"1. Send GET request to buyer-facing endpoint /v1/listings/{id}
+2. Inspect JSON response and rendered web DOM","Asking price is present, but minOffer is completely stripped from payload and UI.",,No,,,
+TC-BULK-001,FR-12,Bulk Listing Type,Verify GSTIN verification banner for Bulk listing -> Verified message displayed,Positive,High,Business seller with verified GSTIN selected Bulk listing type,gstin: 29ABCDE1234F1Z5,1. Navigate to Bulk pricing step (Step 3),Green banner displays 'GSTIN 29ABCDE1234F1Z5 verified. GST invoices will be generated automatically.',,No,,,
+TC-BULK-002,"FR-11, BR-04, AC-08",Bulk Listing Type,Enter non-decreasing unit prices across price tiers -> Inline validation error blocks publishing,Validation,High,Seller is on Bulk pricing step,tier1: qty: 50; price: 120; tier2: qty: 200; price: 105; tier3: qty: 500; price: 110,"1. Configure Tier 1: 50 units @ Rs. 120
+2. Configure Tier 2: 200 units @ Rs. 105
+3. Configure Tier 3: 500 units @ Rs. 110
+4. Blur or attempt to proceed","Inline validation error appears: 'Tier 3 must be cheaper than Rs.105', and publishing is blocked.",,No,,,

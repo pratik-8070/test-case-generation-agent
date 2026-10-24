@@ -1,0 +1,959 @@
+{
+  "metadata": {
+    "suite_name": "Payment Method Orchestrator Test Suite",
+    "created": "2026-10-15",
+    "input_types": [
+      "PRD",
+      "API_SPEC",
+      "TECHNICAL_SPEC"
+    ],
+    "analysis_file": "input-analysis.json",
+    "notes": "Comprehensive test suite covering multi-method payment orchestration, eligibility rules, state transitions, API endpoints, error handling, gateway failover, and reconciliation."
+  },
+  "test_cases": [
+    {
+      "id": "TC-PAYMENT-001",
+      "source_refs": [
+        "AC-01"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Fetch server-driven method list for standard order -> All eight payment methods displayed",
+      "description": "Verifies that the payment page successfully retrieves and renders all eight payment methods from the server-driven method list for a standard eligible order.",
+      "test_type": "Positive",
+      "priority": "Critical",
+      "preconditions": [
+        "Checkout service has created a valid payment intent for a standard order of ₹2,500"
+      ],
+      "test_data": {
+        "order_amount": 250000,
+        "cart_type": "Standard"
+      },
+      "steps": [
+        "Send GET /v1/payments/intents/{id} or load payment page",
+        "Inspect the list of allowed methods returned in the response"
+      ],
+      "expected_result": "Response contains all 8 payment methods (Cards, UPI, Net Banking, Wallets & Postpaid, E-Gift Vouchers, Pay Later, EMI, Cash on Delivery) with eligibility status true.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-002",
+      "source_refs": [
+        "AC-01"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Fetch method list with invalid intent ID or unauthenticated request -> Returns 404 or 401 error",
+      "description": "Verifies validation and negative handling when requesting payment methods with an invalid intent identifier.",
+      "test_type": "Negative",
+      "priority": "High",
+      "preconditions": [
+        "Payment intent does not exist"
+      ],
+      "test_data": {
+        "invalid_intent_id": "00000000-0000-0000-0000-000000000000"
+      },
+      "steps": [
+        "Send GET /v1/payments/intents/00000000-0000-0000-0000-000000000000"
+      ],
+      "expected_result": "API returns 404 Not Found error with proper error schema and no method list.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-003",
+      "source_refs": [
+        "AC-03"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Submit payment attempt with duplicate Idempotency-Key within 24 hours -> Original attempt returned without double charge",
+      "description": "Verifies idempotency enforcement ensuring duplicate requests with the same Idempotency-Key return the original transaction without initiating a second charge.",
+      "test_type": "Business Rule",
+      "priority": "Critical",
+      "preconditions": [
+        "Payment intent OPEN",
+        "Client has a unique Idempotency-Key"
+      ],
+      "test_data": {
+        "idempotency_key": "IDEMP-KEY-998877",
+        "method": "CARD",
+        "amount": 150000
+      },
+      "steps": [
+        "Send POST /v1/payments/intents/{id}/attempts with header Idempotency-Key: IDEMP-KEY-998877",
+        "Resend the identical POST request with the same Idempotency-Key within 24 hours"
+      ],
+      "expected_result": "First request initiates payment attempt (201 Created); second request returns the exact same attempt record without creating a new payment attempt or charging the buyer again.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-004",
+      "source_refs": [
+        "AC-03"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Submit payment attempt with missing Idempotency-Key header -> Returns validation error",
+      "description": "Verifies validation requirement ensuring that idempotency key header is strictly required for attempt creation.",
+      "test_type": "Validation",
+      "priority": "High",
+      "preconditions": [
+        "Payment intent OPEN"
+      ],
+      "test_data": {
+        "missing_header": true,
+        "method": "CARD",
+        "amount": 150000
+      },
+      "steps": [
+        "Send POST /v1/payments/intents/{id}/attempts without Idempotency-Key header"
+      ],
+      "expected_result": "API returns 400 Bad Request or 422 Unprocessable Entity stating Idempotency-Key header is required.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-005",
+      "source_refs": [
+        "AC-05"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Gateway success rate drops below threshold -> Traffic automatically shifts to secondary gateway",
+      "description": "Verifies automatic failover routing when the primary gateway experiences a degradation in success rate.",
+      "test_type": "Integration",
+      "priority": "Critical",
+      "preconditions": [
+        "Primary gateway (Gateway A) success rate drops 10 points below 24-hour average"
+      ],
+      "test_data": {
+        "gateway_primary": "Gateway A",
+        "gateway_secondary": "Gateway B"
+      },
+      "steps": [
+        "Simulate continuous failures on Gateway A over a 10-minute window",
+        "Initiate a new Card payment attempt"
+      ],
+      "expected_result": "Orchestrator automatically routes the payment attempt to Gateway B without requiring a deployment or client release.",
+      "postconditions": [],
+      "assumption": true,
+      "assumption_refs": [
+        "A-01"
+      ]
+    },
+    {
+      "id": "TC-PAYMENT-006",
+      "source_refs": [
+        "AC-05"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Both primary and secondary gateways are completely unavailable -> Returns PROVIDER_UNAVAILABLE error",
+      "description": "Verifies error handling when failover cannot route traffic because both primary and secondary gateways are down.",
+      "test_type": "Error Handling",
+      "priority": "High",
+      "preconditions": [
+        "Gateway A and Gateway B both experiencing outages"
+      ],
+      "test_data": {
+        "gateway_status": "both_down"
+      },
+      "steps": [
+        "Initiate payment attempt when both primary and secondary gateways are unavailable"
+      ],
+      "expected_result": "API returns error with code PROVIDER_UNAVAILABLE and buyer message 'This option is slow right now. Try another.'",
+      "postconditions": [],
+      "assumption": true,
+      "assumption_refs": [
+        "A-01"
+      ]
+    },
+    {
+      "id": "TC-PAYMENT-007",
+      "source_refs": [
+        "AC-FR16-1",
+        "BR-01"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "View payment methods for Buyer Protection or Luxury cart -> Cash on Delivery is hidden",
+      "description": "Verifies that Cash on Delivery is hidden for Buyer Protection and Luxury orders per listing-type eligibility rules.",
+      "test_type": "Business Rule",
+      "priority": "High",
+      "preconditions": [
+        "Buyer has a Luxury listing in the cart"
+      ],
+      "test_data": {
+        "cart_type": "Luxury",
+        "amount": 1500000
+      },
+      "steps": [
+        "Create payment intent for the Luxury cart",
+        "Fetch allowed payment methods via GET /v1/payments/intents/{id}"
+      ],
+      "expected_result": "Allowed methods list contains prepaid options but excludes Cash on Delivery, with eligibility reason stating COD isn't available for Luxury items.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-008",
+      "source_refs": [
+        "AC-PAY-004.2",
+        "BR-01"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "View payment methods for Bulk order cart -> Prepaid methods allowed and Cash on Delivery hidden",
+      "description": "Verifies that Bulk orders permit all prepaid methods while hiding Cash on Delivery.",
+      "test_type": "Business Rule",
+      "priority": "Medium",
+      "preconditions": [
+        "Buyer has a Bulk order in the cart"
+      ],
+      "test_data": {
+        "cart_type": "Bulk",
+        "amount": 2000000
+      },
+      "steps": [
+        "Create payment intent for Bulk order",
+        "Inspect allowed methods"
+      ],
+      "expected_result": "All prepaid methods are allowed; Cash on Delivery is hidden.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-009",
+      "source_refs": [
+        "AC-PAY-004.3",
+        "BR-01"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "View payment methods for mixed cart containing Luxury and Standard items -> Strictest rule wins and COD is hidden",
+      "description": "Verifies that when a cart mixes item types, the strictest rule applies (hiding COD for Luxury/Buyer Protection/Bulk).",
+      "test_type": "Business Rule",
+      "priority": "High",
+      "preconditions": [
+        "Cart contains both Standard and Luxury items"
+      ],
+      "test_data": {
+        "cart_items": [
+          "Standard Item",
+          "Luxury Item"
+        ]
+      },
+      "steps": [
+        "Create payment intent for mixed cart",
+        "Fetch allowed payment methods"
+      ],
+      "expected_result": "Cash on Delivery is hidden due to the Luxury item constraint winning.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-010",
+      "source_refs": [
+        "AC-PAY-004.4",
+        "BR-PAY-002"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Check EMI eligibility for order amount below minimum threshold -> EMI method unavailable",
+      "description": "Verifies boundary condition for EMI eligibility where order amounts under ₹3,000 do not qualify for EMI.",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Order amount is set below ₹3,000"
+      ],
+      "test_data": {
+        "amount_minor": 299900
+      },
+      "steps": [
+        "Request EMI plans or check allowed methods for amount 299900 (₹2,999)",
+        "Test boundary amount 300000 (₹3,000)"
+      ],
+      "expected_result": "For ₹2,999, EMI is ineligible and hidden; for ₹3,000, EMI is eligible and available.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-011",
+      "source_refs": [
+        "AC-PAY-004.5",
+        "BR-01"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Check Cash on Delivery eligibility across order amount boundary -> COD blocked above ₹50,000",
+      "description": "Verifies boundary condition for Cash on Delivery amount cap at ₹50,000 (testing ₹50,000 vs ₹50,001).",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Order has serviceable PIN code and normal items"
+      ],
+      "test_data": {
+        "amounts": [
+          5000000,
+          5000100
+        ]
+      },
+      "steps": [
+        "Create payment intent with amount 5000000 (₹50,000) and check COD eligibility",
+        "Create payment intent with amount 5000100 (₹50,001) and check COD eligibility"
+      ],
+      "expected_result": "COD is available for ₹50,000; COD is hidden for ₹50,001 with eligibility reason.",
+      "postconditions": [],
+      "assumption": true,
+      "assumption_refs": [
+        "A-02"
+      ]
+    },
+    {
+      "id": "TC-PAYMENT-012",
+      "source_refs": [
+        "AC-PAY-004.5",
+        "BR-01"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Attempt Cash on Delivery with buyer having 2+ refused orders in 90 days -> COD blocked",
+      "description": "Verifies that buyers with 2 or more refused COD orders in the last 90 days cannot select Cash on Delivery.",
+      "test_type": "Business Rule",
+      "priority": "High",
+      "preconditions": [
+        "Buyer account has 2 refused COD deliveries within past 90 days"
+      ],
+      "test_data": {
+        "refused_cod_count": 2
+      },
+      "steps": [
+        "Create payment intent for eligible standard order",
+        "Fetch allowed payment methods"
+      ],
+      "expected_result": "Cash on Delivery is marked ineligible and hidden for the buyer.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-013",
+      "source_refs": [
+        "AC-PAY-005.1",
+        "BR-PAY-003"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Payment intent expires after 30 minutes of inactivity -> Status updates to EXPIRED and payment blocked",
+      "description": "Verifies that unpaid payment intents automatically expire after 30 minutes.",
+      "test_type": "Business Rule",
+      "priority": "High",
+      "preconditions": [
+        "Payment intent created with status OPEN"
+      ],
+      "test_data": {
+        "elapsed_time_min": 31
+      },
+      "steps": [
+        "Simulate passage of 31 minutes without successful payment",
+        "Attempt to initiate a payment attempt on the expired intent"
+      ],
+      "expected_result": "Intent status transitions to EXPIRED, attempt creation returns 422 with intent expired error, and buyer sees 'Session expired. Please restart checkout.'",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-014",
+      "source_refs": [
+        "AC-PAY-005.2"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Receive late payment success webhook after intent has expired -> System triggers automatic refund",
+      "description": "Verifies that if payment success arrives after the intent has expired, the payment is automatically refunded so the buyer is never charged for an unplaced order.",
+      "test_type": "Error Handling",
+      "priority": "Critical",
+      "preconditions": [
+        "Payment intent status is EXPIRED"
+      ],
+      "test_data": {
+        "provider_ref": "REF-LATE-12345",
+        "amount": 250000
+      },
+      "steps": [
+        "Send webhook callback with SUCCEEDED status for an expired intent"
+      ],
+      "expected_result": "System records attempt success but immediately initiates an auto-refund for the transaction and notifies the buyer.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-015",
+      "source_refs": [
+        "AC-PAY-006.1"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Initiate Card payment with saved token -> Redirects to 3-D Secure authentication page",
+      "description": "Verifies that selecting a saved network-tokenised card initiates a payment attempt redirecting to 3-D Secure.",
+      "test_type": "Positive",
+      "priority": "Critical",
+      "preconditions": [
+        "Buyer has a saved network-tokenised card"
+      ],
+      "test_data": {
+        "method": "CARD",
+        "card_token": "tok_visa_1234"
+      },
+      "steps": [
+        "Send POST /v1/payments/intents/{id}/attempts with method CARD and saved token",
+        "Inspect response next action"
+      ],
+      "expected_result": "Response returns NextAction with redirect URL to 3-D Secure page, keeping card data out of server scope.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-016",
+      "source_refs": [
+        "AC-PAY-006.2"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Initiate UPI payment attempt -> Client polls status every 3s and handles webhook source of truth",
+      "description": "Verifies UPI intent initiation, client polling mechanism every 3 seconds for up to 5 minutes, and webhook callback handling.",
+      "test_type": "Positive",
+      "priority": "Critical",
+      "preconditions": [
+        "Payment intent OPEN"
+      ],
+      "test_data": {
+        "method": "UPI",
+        "upi_flow": "INTENT"
+      },
+      "steps": [
+        "Send POST /v1/payments/intents/{id}/attempts for UPI intent",
+        "Client polls GET /v1/payments/attempts/{id} every 3 seconds",
+        "Simulate webhook callback confirming payment success"
+      ],
+      "expected_result": "Attempt returns intent URI, client successfully polls status while showing approval timer, and webhook terminal state updates intent to PAID.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-017",
+      "source_refs": [
+        "AC-PAY-006.3",
+        "BR-PAY-004"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Perform split tender with E-Gift Voucher and UPI -> Voucher amount blocked and remainder paid via UPI",
+      "description": "Verifies split tender payment using an E-Gift Voucher (up to 3 vouchers) combined with one other payment method.",
+      "test_type": "Positive",
+      "priority": "High",
+      "preconditions": [
+        "Order total ₹2,500; gift voucher balance ₹1,000"
+      ],
+      "test_data": {
+        "vouchers": [
+          "GV-001"
+        ],
+        "remainder_method": "UPI",
+        "remainder_amount": 150000
+      },
+      "steps": [
+        "Apply gift voucher ₹1,000 (Attempt 1 succeeds, blocking voucher funds)",
+        "Pay remaining ₹1,500 via UPI (Attempt 2 succeeds)"
+      ],
+      "expected_result": "Intent status becomes PAID with amount_captured_minor equaling total order amount.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-018",
+      "source_refs": [
+        "AC-PAY-006.3",
+        "BR-PAY-004"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Split tender second attempt fails -> Held gift voucher funds released after intent expires",
+      "description": "Verifies that when a split tender second attempt fails, the gift voucher funds held during the attempt are released when the intent expires.",
+      "test_type": "Error Handling",
+      "priority": "High",
+      "preconditions": [
+        "Gift voucher ₹1,000 successfully applied (attempt 1)"
+      ],
+      "test_data": {
+        "remainder_method": "UPI",
+        "attempt_status": "FAILED"
+      },
+      "steps": [
+        "Simulate failure of second payment attempt for remainder",
+        "Allow payment intent to reach 30-minute expiration"
+      ],
+      "expected_result": "Held gift voucher funds are released back to the voucher balance upon intent expiration.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-019",
+      "source_refs": [
+        "AC-PAY-007.1"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Attempt payment with insufficient funds -> Returns normalised INSUFFICIENT_FUNDS error code and message",
+      "description": "Verifies error handling and normalisation when an issuer or wallet declines a payment due to low balance.",
+      "test_type": "Negative",
+      "priority": "High",
+      "preconditions": [
+        "Payment intent created"
+      ],
+      "test_data": {
+        "method": "WALLET",
+        "simulation": "low_balance"
+      },
+      "steps": [
+        "Initiate payment attempt that results in insufficient funds response from provider",
+        "Inspect API response and error code"
+      ],
+      "expected_result": "API returns error with code INSUFFICIENT_FUNDS and buyer-facing message 'Not enough balance. Pay the rest with another method.'",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-020",
+      "source_refs": [
+        "AC-PAY-007.1"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Attempt payment with declined card -> Returns PAYMENT_DECLINED error code and message",
+      "description": "Verifies normalisation of card decline responses from gateway into standard PAYMENT_DECLINED error.",
+      "test_type": "Negative",
+      "priority": "High",
+      "preconditions": [
+        "Payment intent created"
+      ],
+      "test_data": {
+        "method": "CARD",
+        "simulation": "decline"
+      },
+      "steps": [
+        "Initiate card payment with test card triggering issuer decline"
+      ],
+      "expected_result": "Response indicates failure with code PAYMENT_DECLINED and message 'Your bank declined this payment. Try another method.'",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-021",
+      "source_refs": [
+        "AC-PAY-008.1",
+        "BR-PAY-005"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Receive webhook callback with valid HMAC signature and duplicate event -> First terminal status wins",
+      "description": "Verifies webhook security via HMAC signature verification and idempotency processing where duplicate webhooks do not alter final state.",
+      "test_type": "Security",
+      "priority": "Critical",
+      "preconditions": [
+        "Payment attempt in PENDING state"
+      ],
+      "test_data": {
+        "signature": "sha256=valid_hmac",
+        "provider_ref": "GW-TXN-112233"
+      },
+      "steps": [
+        "Send POST /v1/payments/webhooks/{provider} with valid signature and SUCCEEDED status",
+        "Resend identical webhook payload"
+      ],
+      "expected_result": "First webhook updates attempt to SUCCEEDED; duplicate webhook is logged only without changing state or triggering duplicate processing.",
+      "postconditions": [],
+      "assumption": false
+    },
+    {
+      "id": "TC-PAYMENT-022",
+      "source_refs": [
+        "AC-PAY-008.1"
+      ],
+      "feature": "Payment Method Orchestrator",
+      "scenario": "Receive webhook callback with invalid HMAC signature -> Rejected with 401 Unauthorized",
+      "description": "Verifies security control rejecting tampered or unverified webhook requests.",
+      "test_type": "Security",
+      "priority": "Critical",
+      "preconditions": [
+        "Webhook endpoint active"
+      ],
+      "test_data": {
+        "signature": "sha256=invalid_signature"
+      },
+      "steps": [
+        "Send POST /v1/payments/webhooks/{provider} with invalid signature header"
+      ],
+      "expected_result": "Endpoint rejects request with 401 Unauthorized and does not process payload.",
+      "postconditions": [],
+      "assumption": false
+    }
+  ],
+  "review_findings": [],
+  "coverage_summary": {
+    "gaps": [
+      {
+        "ref": "FR-8",
+        "description": "Exact gateway health scoring algorithm formulas and latency weightings.",
+        "reason": "Not fully specified in RFC; relies on internal adapter configuration."
+      }
+    ],
+    "notes": "The test suite thoroughly covers multi-method payment orchestration, eligibility rules for restricted items (Luxury, Bulk, Buyer Protection), state machine transitions, split tenders, idempotency, gateway failover, and reconciliation, preserving exact requirement and AC IDs from inputs.",
+    "computed": {
+      "total_test_cases": 22,
+      "positive": 4,
+      "negative": 6,
+      "boundary": 2,
+      "edge": 0,
+      "validation": 1,
+      "by_type": {
+        "Boundary": 2,
+        "Business Rule": 6,
+        "Error Handling": 3,
+        "Integration": 1,
+        "Negative": 3,
+        "Positive": 4,
+        "Security": 2,
+        "Validation": 1
+      },
+      "by_priority": {
+        "Critical": 8,
+        "High": 13,
+        "Medium": 1
+      },
+      "assumption_based": 3,
+      "requirements_identified": 8,
+      "acceptance_criteria_identified": 15,
+      "business_rules_identified": 5,
+      "requirements_covered": 8,
+      "acceptance_criteria_covered": 15,
+      "business_rules_covered": 5,
+      "uncovered": {
+        "requirements": [],
+        "acceptance_criteria": [],
+        "business_rules": []
+      },
+      "requirements_without_negative": [],
+      "traceability": {
+        "requirements": [
+          {
+            "id": "FR-1",
+            "text": "The system shall support eight payment methods (Cards, UPI, Net Banking, Wallets & Postpaid, E-Gift Vouchers, Pay Later, EMI, and Cash on Delivery) on web, Android, and iOS from one server-driven method list.",
+            "test_cases": [
+              "TC-PAYMENT-001",
+              "TC-PAYMENT-002"
+            ],
+            "test_types": [
+              "Negative",
+              "Positive"
+            ]
+          },
+          {
+            "id": "FR-3",
+            "text": "Every payment attempt shall be idempotent and reconciled daily against gateway settlement files without losing or double-charging a payment.",
+            "test_cases": [
+              "TC-PAYMENT-003",
+              "TC-PAYMENT-004"
+            ],
+            "test_types": [
+              "Business Rule",
+              "Validation"
+            ]
+          },
+          {
+            "id": "FR-8",
+            "text": "The system shall route traffic around a failing gateway to a secondary gateway without requiring a release.",
+            "test_cases": [
+              "TC-PAYMENT-005",
+              "TC-PAYMENT-006"
+            ],
+            "test_types": [
+              "Error Handling",
+              "Integration"
+            ]
+          },
+          {
+            "id": "FR-16",
+            "text": "The system shall enforce payment method eligibility rules based on cart type, order amount, PIN code, and buyer history.",
+            "test_cases": [
+              "TC-PAYMENT-007",
+              "TC-PAYMENT-008",
+              "TC-PAYMENT-009",
+              "TC-PAYMENT-010",
+              "TC-PAYMENT-011",
+              "TC-PAYMENT-012"
+            ],
+            "test_types": [
+              "Boundary",
+              "Business Rule"
+            ]
+          },
+          {
+            "id": "REQ-PAY-005",
+            "text": "The system shall maintain a payment intent lifecycle and a payment attempt state machine with terminal states Succeeded, Failed, COD confirmed, and Auto-refunded.",
+            "test_cases": [
+              "TC-PAYMENT-013",
+              "TC-PAYMENT-014"
+            ],
+            "test_types": [
+              "Business Rule",
+              "Error Handling"
+            ]
+          },
+          {
+            "id": "REQ-PAY-006",
+            "text": "The system shall provide method-specific initiation, callback handling, and status checking via isolated adapters.",
+            "test_cases": [
+              "TC-PAYMENT-015",
+              "TC-PAYMENT-016",
+              "TC-PAYMENT-017",
+              "TC-PAYMENT-018"
+            ],
+            "test_types": [
+              "Error Handling",
+              "Positive"
+            ]
+          },
+          {
+            "id": "REQ-PAY-007",
+            "text": "The payment API shall provide endpoints for intent creation, intent retrieval, attempt initiation, attempt status checking, webhooks, and EMI plans with signature verification and idempotency enforcement.",
+            "test_cases": [
+              "TC-PAYMENT-019",
+              "TC-PAYMENT-020",
+              "TC-PAYMENT-021"
+            ],
+            "test_types": [
+              "Negative",
+              "Security"
+            ]
+          },
+          {
+            "id": "NFR-4",
+            "text": "The system shall enforce security and compliance controls including PCI DSS scoping via gateway-hosted fields, network-tokenised saved cards, data localisation in India, and HMAC signature verification for webhooks.",
+            "test_cases": [
+              "TC-PAYMENT-021",
+              "TC-PAYMENT-022"
+            ],
+            "test_types": [
+              "Security"
+            ]
+          }
+        ],
+        "acceptance_criteria": [
+          {
+            "id": "AC-01",
+            "text": "Payment page displays server-driven method list containing all applicable methods for the order.",
+            "test_cases": [
+              "TC-PAYMENT-001",
+              "TC-PAYMENT-002"
+            ],
+            "test_types": [
+              "Negative",
+              "Positive"
+            ]
+          },
+          {
+            "id": "AC-03",
+            "text": "Submitting an attempt with a duplicate Idempotency-Key within 24 hours returns the original attempt rather than creating a new charge.",
+            "test_cases": [
+              "TC-PAYMENT-003",
+              "TC-PAYMENT-004"
+            ],
+            "test_types": [
+              "Business Rule",
+              "Validation"
+            ]
+          },
+          {
+            "id": "AC-05",
+            "text": "Traffic automatically shifts from primary gateway to secondary gateway when success rate drops 10 points below the 24-hour average.",
+            "test_cases": [
+              "TC-PAYMENT-005",
+              "TC-PAYMENT-006"
+            ],
+            "test_types": [
+              "Error Handling",
+              "Integration"
+            ]
+          },
+          {
+            "id": "AC-FR16-1",
+            "text": "Buyer Protection and Luxury orders hide Cash on Delivery.",
+            "test_cases": [
+              "TC-PAYMENT-007"
+            ],
+            "test_types": [
+              "Business Rule"
+            ]
+          },
+          {
+            "id": "AC-PAY-004.2",
+            "text": "Bulk orders allow all prepaid methods and hide Cash on Delivery.",
+            "test_cases": [
+              "TC-PAYMENT-008"
+            ],
+            "test_types": [
+              "Business Rule"
+            ]
+          },
+          {
+            "id": "AC-PAY-004.3",
+            "text": "If a cart mixes types, the strictest rule wins (hiding COD for Luxury/Buyer Protection/Bulk).",
+            "test_cases": [
+              "TC-PAYMENT-009"
+            ],
+            "test_types": [
+              "Business Rule"
+            ]
+          },
+          {
+            "id": "AC-PAY-004.4",
+            "text": "EMI requires order amount >= ₹3,000 and an eligible card and tenure.",
+            "test_cases": [
+              "TC-PAYMENT-010"
+            ],
+            "test_types": [
+              "Boundary"
+            ]
+          },
+          {
+            "id": "AC-PAY-004.5",
+            "text": "Cash on Delivery is hidden for orders > ₹50,000, unserviceable PIN codes, or buyers with 2+ refused COD orders in 90 days.",
+            "test_cases": [
+              "TC-PAYMENT-011",
+              "TC-PAYMENT-012"
+            ],
+            "test_types": [
+              "Boundary",
+              "Business Rule"
+            ]
+          },
+          {
+            "id": "AC-PAY-005.1",
+            "text": "Payment intent transitions through OPEN, PARTIALLY_PAID, PAID, COD_CONFIRMED, EXPIRED, CANCELLED states correctly.",
+            "test_cases": [
+              "TC-PAYMENT-013"
+            ],
+            "test_types": [
+              "Business Rule"
+            ]
+          },
+          {
+            "id": "AC-PAY-005.2",
+            "text": "A late success received after intent expiration triggers an automatic refund.",
+            "test_cases": [
+              "TC-PAYMENT-014"
+            ],
+            "test_types": [
+              "Error Handling"
+            ]
+          },
+          {
+            "id": "AC-PAY-006.1",
+            "text": "Cards adapter redirects to 3-D Secure page and supports tokenised saved cards.",
+            "test_cases": [
+              "TC-PAYMENT-015"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "AC-PAY-006.2",
+            "text": "UPI adapter returns intent URI or QR code, polls every 3s for up to 5 min, and treats webhook as source of truth.",
+            "test_cases": [
+              "TC-PAYMENT-016"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "AC-PAY-006.3",
+            "text": "Gift vouchers allow split tender with one other method and up to 3 vouchers per order.",
+            "test_cases": [
+              "TC-PAYMENT-017",
+              "TC-PAYMENT-018"
+            ],
+            "test_types": [
+              "Error Handling",
+              "Positive"
+            ]
+          },
+          {
+            "id": "AC-PAY-007.1",
+            "text": "API endpoints return correct normalise error codes and messages (PAYMENT_DECLINED, AUTH_FAILED, INSUFFICIENT_FUNDS, METHOD_NOT_ELIGIBLE, PROVIDER_UNAVAILABLE, PAYMENT_TIMEOUT, INTENT_EXPIRED).",
+            "test_cases": [
+              "TC-PAYMENT-019",
+              "TC-PAYMENT-020"
+            ],
+            "test_types": [
+              "Negative"
+            ]
+          },
+          {
+            "id": "AC-PAY-008.1",
+            "text": "Webhooks verify HMAC signatures, check IP allow-lists, and enforce a replay window of 5 minutes.",
+            "test_cases": [
+              "TC-PAYMENT-021",
+              "TC-PAYMENT-022"
+            ],
+            "test_types": [
+              "Security"
+            ]
+          }
+        ],
+        "business_rules": [
+          {
+            "id": "BR-01",
+            "text": "COD is blocked for Buyer Protection, Luxury, Bulk items, orders over ₹50,000, unserviceable PIN codes, and buyers with 2+ refused COD orders in the last 90 days.",
+            "test_cases": [
+              "TC-PAYMENT-007",
+              "TC-PAYMENT-008",
+              "TC-PAYMENT-009",
+              "TC-PAYMENT-011",
+              "TC-PAYMENT-012"
+            ],
+            "test_types": [
+              "Boundary",
+              "Business Rule"
+            ]
+          },
+          {
+            "id": "BR-PAY-002",
+            "text": "EMI requires order amount of at least ₹3,000 and an eligible card/tenure combination.",
+            "test_cases": [
+              "TC-PAYMENT-010"
+            ],
+            "test_types": [
+              "Boundary"
+            ]
+          },
+          {
+            "id": "BR-PAY-003",
+            "text": "Payment intent expires exactly 30 minutes after creation if unpaid.",
+            "test_cases": [
+              "TC-PAYMENT-013"
+            ],
+            "test_types": [
+              "Business Rule"
+            ]
+          },
+          {
+            "id": "BR-PAY-004",
+            "text": "Split tender with Gift Voucher holds the voucher amount for 30 minutes; if the second attempt fails and intent expires, held voucher funds are released.",
+            "test_cases": [
+              "TC-PAYMENT-017",
+              "TC-PAYMENT-018"
+            ],
+            "test_types": [
+              "Error Handling",
+              "Positive"
+            ]
+          },
+          {
+            "id": "BR-PAY-005",
+            "text": "Webhook and redirect may arrive in any order; the first terminal status wins and later ones are logged only.",
+            "test_cases": [
+              "TC-PAYMENT-021"
+            ],
+            "test_types": [
+              "Security"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,433 @@
+{
+  "metadata": {
+    "run_id": "2026-10-13-gemini-e2e",
+    "created": "2026-10-13",
+    "notes": "Multi-type listing flow input containing Confluence PRD, RFC, index pages, and Figma screenshots."
+  },
+  "inputs": [
+    {
+      "source": "confluence-720897-Create-Listing-Multi-Type.md",
+      "input_type": "PRD",
+      "secondary_types": [
+        "FEATURE_DESCRIPTION"
+      ],
+      "confidence": "high",
+      "evidence": [
+        "Home for the Create Listing (Multi-Type) feature",
+        "Listing types at a glance"
+      ]
+    },
+    {
+      "source": "confluence-753666-PRD-Create-Listing-Multi-Type.md",
+      "input_type": "PRD",
+      "secondary_types": [
+        "ACCEPTANCE_CRITERIA"
+      ],
+      "confidence": "high",
+      "evidence": [
+        "PRD: Create Listing (Multi-Type)",
+        "Functional requirements",
+        "Acceptance criteria"
+      ]
+    },
+    {
+      "source": "confluence-786433-RFC-Create-Listing-Multi-Type.md",
+      "input_type": "TECHNICAL_SPEC",
+      "secondary_types": [
+        "API_SPEC"
+      ],
+      "confidence": "high",
+      "evidence": [
+        "RFC: Create Listing (Multi-Type)",
+        "Listing type strategy",
+        "API contracts, error codes and idempotency"
+      ]
+    },
+    {
+      "source": "figma-00-Cover-PRD-RFC.png",
+      "input_type": "UI_DESIGN",
+      "confidence": "high",
+      "evidence": [
+        "DEMO DESIGN",
+        "Create Listing (Multi-Type) mobile flow"
+      ]
+    },
+    {
+      "source": "figma-01-Choose-listing-type.png",
+      "input_type": "UI_DESIGN",
+      "confidence": "high",
+      "evidence": [
+        "Step 1 of 5 · Listing type",
+        "What are you listing?",
+        "Standard, Buyer Protection, Luxury, OM (Offer Mode), Bulk"
+      ]
+    },
+    {
+      "source": "figma-02-Item-details.png",
+      "input_type": "UI_DESIGN",
+      "confidence": "high",
+      "evidence": [
+        "Step 2 of 5 · Draft saved just now",
+        "Photos (3 of 10)",
+        "Title, Category, Condition, Description, Quantity, Returns"
+      ]
+    },
+    {
+      "source": "figma-03a-Buyer-Protection-step.png",
+      "input_type": "UI_DESIGN",
+      "confidence": "high",
+      "evidence": [
+        "Step 3 of 5 · Type settings",
+        "Buyer Protection",
+        "Protection fee (paid by buyer)",
+        "Tracked shipping (required)"
+      ]
+    },
+    {
+      "source": "figma-03b-Luxury-step.png",
+      "input_type": "UI_DESIGN",
+      "confidence": "high",
+      "evidence": [
+        "Step 3 of 5 · Authentication",
+        "Luxury details",
+        "Brand, Model, Serial number, Price, Proof of purchase, Required photos"
+      ]
+    },
+    {
+      "source": "figma-03c-OM-step.png",
+      "input_type": "UI_DESIGN",
+      "confidence": "high",
+      "evidence": [
+        "Step 3 of 5 · OM (Offer Mode)",
+        "Asking price",
+        "Minimum offer (optional)",
+        "Offers expire after 24h, 48h, 72h"
+      ]
+    },
+    {
+      "source": "figma-03d-Bulk-step.png",
+      "input_type": "UI_DESIGN",
+      "confidence": "high",
+      "evidence": [
+        "Step 3 of 5 · Bulk",
+        "Minimum order (MOQ), Stock",
+        "Price tiers (up to 5)"
+      ]
+    },
+    {
+      "source": "figma-04-Preview-as-buyer.png",
+      "input_type": "UI_DESIGN",
+      "confidence": "high",
+      "evidence": [
+        "Step 4 of 5 · This is what buyers see",
+        "Preview",
+        "Buyer Protection badge",
+        "Edit, Publish buttons"
+      ]
+    },
+    {
+      "source": "figma-05a-Published-Live.png",
+      "input_type": "UI_DESIGN",
+      "confidence": "high",
+      "evidence": [
+        "Your listing is live",
+        "Listing ID, Type, Status: Live"
+      ]
+    },
+    {
+      "source": "figma-05b-Luxury-Pending-Review.png",
+      "input_type": "UI_DESIGN",
+      "confidence": "high",
+      "evidence": [
+        "Sent for authentication",
+        "Status: Pending Review"
+      ]
+    }
+  ],
+  "features": [
+    {
+      "code": "LISTING",
+      "name": "Create Listing Common Flow",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §Functional requirements",
+      "description": "Common fields, drafts, navigation, preview, and publishing across all listing types."
+    },
+    {
+      "code": "BUYER-PROT",
+      "name": "Buyer Protection Listing Type",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-4, FR-5",
+      "description": "Buyer protection escrow, fees, and badge handling."
+    },
+    {
+      "code": "LUXURY",
+      "name": "Luxury Listing Type",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-6, FR-7, FR-8",
+      "description": "Authentication workflow, proof of purchase, and Rs. 50,000 minimum price."
+    },
+    {
+      "code": "OM",
+      "name": "Offer Mode Listing Type",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-9, FR-10",
+      "description": "Asking price, hidden minimum offer, and offer expiry window."
+    },
+    {
+      "code": "BULK",
+      "name": "Bulk Listing Type",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-11, FR-12",
+      "description": "MOQ, stock count, tiered pricing, and GSTIN verification."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "FR-1",
+      "feature": "LISTING",
+      "text": "Type selector is the first step; each type shows a one-line description and eligibility status.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-1",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-2",
+      "feature": "LISTING",
+      "text": "Ineligible types are visible but disabled, with the reason and how to qualify.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-2",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-3",
+      "feature": "LISTING",
+      "text": "Auto-save draft every 10 s and on step change.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-3",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-4",
+      "feature": "BUYER-PROT",
+      "text": "Show protection fee and payout timeline before publish; require tracked shipping.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-4",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-5",
+      "feature": "BUYER-PROT",
+      "text": "Listing card shows a Buyer Protection badge.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-5",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-6",
+      "feature": "LUXURY",
+      "text": "Price must be >= Rs. 50,000; brand, model and serial number required.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-6",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-7",
+      "feature": "LUXURY",
+      "text": "Upload proof of purchase (PDF/JPG) and at least 4 photos incl. serial and logo close-ups.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-7",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-8",
+      "feature": "LUXURY",
+      "text": "On submit, status = Pending Review until authentication passes; then Live with Verified Luxury badge.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-8",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-9",
+      "feature": "OM",
+      "text": "Seller sets asking price; minimum offer is optional, must be <= asking price and is never shown to buyers.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-9",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-10",
+      "feature": "OM",
+      "text": "Seller sets offer expiry (24, 48 or 72 h); offers below the minimum are auto-declined.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-10",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-11",
+      "feature": "BULK",
+      "text": "Seller sets MOQ and up to 5 price tiers; each tier's unit price must be lower than the previous.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-11",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-12",
+      "feature": "BULK",
+      "text": "GSTIN must be verified on the business account before publish.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-12",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-13",
+      "feature": "LISTING",
+      "text": "Preview screen renders the listing exactly as a buyer sees it, per type.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-13",
+      "origin": "stated"
+    },
+    {
+      "id": "FR-14",
+      "feature": "LISTING",
+      "text": "Publish confirmation shows listing ID, status and a link to the listing.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-14",
+      "origin": "stated"
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "requirement_id": "FR-1",
+      "text": "Seller can select from 5 listing types with descriptions and eligibility info at step 1.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §Acceptance criteria",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-02",
+      "requirement_id": "FR-2",
+      "text": "Ineligible types are disabled with a visible reason and qualification instruction.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §Acceptance criteria",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-03",
+      "requirement_id": "FR-3",
+      "text": "Draft auto-saves and restores after closing the browser or app.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §Acceptance criteria",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-04",
+      "requirement_id": "FR-6",
+      "text": "Luxury listing below Rs. 50,000 cannot be published.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §Acceptance criteria",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-05",
+      "requirement_id": "FR-8",
+      "text": "Luxury listing stays Pending Review until authentication passes.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §Acceptance criteria",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-06",
+      "requirement_id": "FR-9",
+      "text": "OM minimum offer is never returned in any buyer-facing API or page.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §Acceptance criteria",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-07",
+      "requirement_id": "FR-10",
+      "text": "OM offers below the minimum are auto-declined.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §Acceptance criteria",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-08",
+      "requirement_id": "FR-11",
+      "text": "Bulk tiers with non-decreasing prices are rejected with an inline error.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §Acceptance criteria",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-09",
+      "requirement_id": "FR-5",
+      "text": "Buyer Protection badge shows on the listing card and detail page.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §Acceptance criteria",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-10",
+      "requirement_id": "FR-13",
+      "text": "Preview matches the published buyer view for every type.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §Acceptance criteria",
+      "origin": "stated"
+    }
+  ],
+  "business_rules": [
+    {
+      "id": "BR-01",
+      "requirement_id": "FR-1",
+      "text": "Listing type cannot be changed after publishing.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §Listing types",
+      "origin": "stated"
+    },
+    {
+      "id": "BR-02",
+      "requirement_id": "FR-6",
+      "text": "Luxury listing minimum price is Rs. 50,000.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §Listing types",
+      "origin": "stated"
+    },
+    {
+      "id": "BR-03",
+      "requirement_id": "FR-9",
+      "text": "OM minimum offer must be <= asking price.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-9",
+      "origin": "stated"
+    },
+    {
+      "id": "BR-04",
+      "requirement_id": "FR-11",
+      "text": "Bulk tier unit prices must be strictly decreasing by quantity.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §FR-11",
+      "origin": "stated"
+    },
+    {
+      "id": "BR-05",
+      "requirement_id": "FR-3",
+      "text": "Common field validations: Title 10-80 chars, Description 50-2000 chars, Photos 1-10 images (max 10MB each, min 800x800px), Quantity integer >= 1.",
+      "source_ref": "confluence-753666-PRD-Create-Listing-Multi-Type.md §Functional requirements",
+      "origin": "stated"
+    }
+  ],
+  "context": {
+    "user_roles": [
+      "Casual seller",
+      "Trusted seller",
+      "Luxury reseller",
+      "Negotiator",
+      "Business seller",
+      "Admin"
+    ],
+    "preconditions": [
+      "Seller is logged in",
+      "Seller has completed necessary KYC/orders for restricted types"
+    ],
+    "inputs": [
+      "Listing type selection",
+      "Common listing details",
+      "Type-specific attributes"
+    ],
+    "expected_behavior": [
+      "Listings created successfully with correct type strategies, statuses, and badges"
+    ]
+  },
+  "clarifications": [
+    {
+      "id": "Q-01",
+      "question": "What is the exact HTTP error code and payload returned when a seller attempts to publish a listing after losing eligibility mid-flow?",
+      "why": "Ensures precise API integration testing and error validation.",
+      "severity": "non_blocking",
+      "related_refs": [
+        "FR-2"
+      ],
+      "status": "assumed",
+      "answer": "Assumed HTTP 403 TYPE_NOT_ELIGIBLE with error message indicating eligibility loss."
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A-01",
+      "text": "Loss of eligibility mid-flow returns HTTP 403 TYPE_NOT_ELIGIBLE with reason payload.",
+      "related_refs": [
+        "FR-2"
+      ],
+      "from_clarification": "Q-01"
+    }
+  ]
+}

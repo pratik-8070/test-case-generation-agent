@@ -1,0 +1,33 @@
+{
+  "metadata": {"suite_name": "Login - fixture", "created": "2026-10-06", "input_types": ["USER_STORY"]},
+  "test_cases": [
+    {
+      "id": "TC-LOGIN-001", "source_refs": ["AC-1.1"], "feature": "Login",
+      "scenario": "Log in with valid registered credentials", "test_type": "Positive", "priority": "Critical",
+      "preconditions": ["User account user@example.com exists and is active"],
+      "test_data": {"email": "user@example.com", "password": "Valid#Pass1"},
+      "steps": ["Open the login page", "Enter the email and password from test data", "Click 'Log in'"],
+      "expected_result": "User is redirected to /dashboard and their name is shown in the header",
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-002", "source_refs": ["AC-1.2"], "feature": "Login",
+      "scenario": "Log in with a wrong password", "test_type": "Negative", "priority": "High",
+      "preconditions": ["User account user@example.com exists and is active"],
+      "test_data": {"email": "user@example.com", "password": "WrongPass9"},
+      "steps": ["Open the login page", "Enter the email and the wrong password", "Click 'Log in'"],
+      "expected_result": "Error 'Invalid email or password' is displayed and the user stays on the login page",
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-003", "source_refs": ["BR-1"], "feature": "Login",
+      "scenario": "Account locks on the 5th consecutive failed attempt", "test_type": "Boundary", "priority": "High",
+      "preconditions": ["User account user@example.com exists with 0 failed attempts"],
+      "test_data": {"failed_attempts": 5},
+      "steps": ["Submit a wrong password 4 times", "Confirm login is still allowed by checking no lock message is shown", "Submit a wrong password a 5th time", "Submit the correct password"],
+      "expected_result": "After the 5th failure the account is locked and the correct password is rejected with the lock message",
+      "assumption": true, "assumption_refs": ["A-1"]
+    }
+  ],
+  "coverage_summary": {"gaps": []}
+}

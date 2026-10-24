@@ -1,0 +1,9 @@
+{
+  "example": "resources/examples/orders-api.yaml",
+  "input_types": ["API_SPEC"],
+  "min_requirements": 2,
+  "test_case_range": [15, 45],
+  "required_test_types": ["Positive", "Validation", "Boundary", "Authentication", "Authorization"],
+  "must_mention": ["POST /orders", "GET /orders/", "201", "400", "401", "404", "409", "20", "21"],
+  "must_not_mention": ["DELETE /orders", "PUT /orders", "PATCH /orders"]
+}

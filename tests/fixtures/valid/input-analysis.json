@@ -1,0 +1,24 @@
+{
+  "metadata": {"run_id": "fixture-login", "created": "2026-10-06"},
+  "inputs": [
+    {"source": "fixture: login story", "input_type": "USER_STORY", "confidence": "high",
+     "evidence": ["'As a registered user, I want to...' story format", "Acceptance criteria listed under the story"]}
+  ],
+  "features": [{"code": "LOGIN", "name": "Login"}],
+  "requirements": [
+    {"id": "US-1", "feature": "LOGIN", "text": "Registered user can log in with email and password", "source_ref": "Story line 1", "origin": "stated"}
+  ],
+  "acceptance_criteria": [
+    {"id": "AC-1.1", "requirement_id": "US-1", "text": "Valid credentials redirect to the dashboard", "source_ref": "AC 1", "origin": "stated"},
+    {"id": "AC-1.2", "requirement_id": "US-1", "text": "Invalid credentials show 'Invalid email or password'", "source_ref": "AC 2", "origin": "stated"}
+  ],
+  "business_rules": [
+    {"id": "BR-1", "requirement_id": "US-1", "text": "Account locks after 5 consecutive failed attempts", "source_ref": "AC 3", "origin": "stated"}
+  ],
+  "clarifications": [
+    {"id": "Q-1", "question": "How long does the lock last?", "severity": "non_blocking", "related_refs": ["BR-1"], "status": "assumed"}
+  ],
+  "assumptions": [
+    {"id": "A-1", "text": "Lock lasts until reset by support; duration not tested", "related_refs": ["BR-1"], "from_clarification": "Q-1"}
+  ]
+}

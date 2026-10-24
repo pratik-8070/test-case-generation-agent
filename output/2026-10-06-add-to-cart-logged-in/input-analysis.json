@@ -1,0 +1,54 @@
+{
+  "metadata": {"run_id": "2026-10-06-add-to-cart-logged-in", "created": "2026-10-06", "notes": "Input pasted in chat; no source IDs, so REQ/AC/BR IDs are assigned."},
+  "inputs": [
+    {
+      "source": "pasted text: 'Feature: Add to Cart'",
+      "input_type": "REQUIREMENT",
+      "secondary_types": ["ACCEPTANCE_CRITERIA"],
+      "confidence": "high",
+      "evidence": [
+        "Labelled 'Requirement:' with a single 'should be able to' statement for one feature",
+        "Numbered 'Acceptance Criteria' list 1-6 attached to that requirement",
+        "No story format ('As a...'), no document sections, no API or UI artefacts"
+      ]
+    }
+  ],
+  "features": [{"code": "CART", "name": "Add to Cart", "source_ref": "pasted text: Feature line"}],
+  "requirements": [
+    {
+      "id": "REQ-001", "feature": "CART",
+      "text": "A logged-in user can add an available product to the shopping cart from the product details page",
+      "source_ref": "pasted text: Requirement", "origin": "stated",
+      "user_role": "Logged-in user",
+      "details": {
+        "user_roles": ["Logged-in user"],
+        "preconditions": ["User is logged in", "User is on a product details page"],
+        "expected_behavior": ["Product added to cart", "Cart count +1", "Cart shows name, price, quantity"],
+        "error_conditions": ["Product is out of stock (AC 5, AC 6)"],
+        "boundary_conditions": ["Available (stock >= 1) vs out of stock (stock 0)"]
+      }
+    }
+  ],
+  "acceptance_criteria": [
+    {"id": "AC-001.1", "requirement_id": "REQ-001", "text": "User can click the 'Add to Cart' button", "source_ref": "pasted text: AC 1", "origin": "stated"},
+    {"id": "AC-001.2", "requirement_id": "REQ-001", "text": "The selected product is added to the cart", "source_ref": "pasted text: AC 2", "origin": "stated"},
+    {"id": "AC-001.3", "requirement_id": "REQ-001", "text": "Cart count increases by 1", "source_ref": "pasted text: AC 3", "origin": "stated"},
+    {"id": "AC-001.4", "requirement_id": "REQ-001", "text": "Product name, price and quantity are displayed correctly in the cart", "source_ref": "pasted text: AC 4", "origin": "stated"},
+    {"id": "AC-001.5", "requirement_id": "REQ-001", "text": "Out-of-stock products cannot be added to the cart", "source_ref": "pasted text: AC 5", "origin": "stated"},
+    {"id": "AC-001.6", "requirement_id": "REQ-001", "text": "User sees an appropriate message when adding an out-of-stock product", "source_ref": "pasted text: AC 6", "origin": "stated"}
+  ],
+  "business_rules": [
+    {"id": "BR-001", "requirement_id": "REQ-001", "text": "Adding to cart is specified for logged-in users only", "source_ref": "pasted text: Requirement ('A logged-in user')", "origin": "stated"}
+  ],
+  "clarifications": [
+    {"id": "Q-1", "question": "Is there a quantity selector on the product details page, or does each 'Add to Cart' click add exactly 1 unit?", "why": "AC 4 mentions quantity but no way to choose it; quantity validation and limits cannot be tested without this.", "severity": "non_blocking", "related_refs": ["AC-001.3", "AC-001.4"], "status": "assumed"},
+    {"id": "Q-2", "question": "When a product already in the cart is added again, does its quantity increase, or is a new line created? Does the cart count show total units or distinct products?", "why": "Changes the expected result of AC 3 for repeat adds.", "severity": "non_blocking", "related_refs": ["AC-001.3"], "status": "assumed"},
+    {"id": "Q-3", "question": "What is the exact out-of-stock message text?", "why": "AC 6 only says 'appropriate message'.", "severity": "non_blocking", "related_refs": ["AC-001.6"], "status": "assumed"},
+    {"id": "Q-4", "question": "What happens when a user who is not logged in clicks 'Add to Cart' (redirect to login, guest cart, or button hidden)?", "why": "The requirement covers logged-in users only; guest behaviour is undefined.", "severity": "non_blocking", "related_refs": ["BR-001"], "status": "out_of_scope"}
+  ],
+  "assumptions": [
+    {"id": "A-1", "text": "Each 'Add to Cart' click adds a quantity of 1 (no quantity selector is described).", "related_refs": ["AC-001.3", "AC-001.4"], "from_clarification": "Q-1"},
+    {"id": "A-2", "text": "Adding a product that is already in the cart increases the cart count by 1 and its total quantity in the cart to 2 (line structure is not asserted).", "related_refs": ["AC-001.3"], "from_clarification": "Q-2"},
+    {"id": "A-3", "text": "The out-of-stock message states that the product is out of stock or unavailable; exact wording is not asserted.", "related_refs": ["AC-001.6"], "from_clarification": "Q-3"}
+  ]
+}

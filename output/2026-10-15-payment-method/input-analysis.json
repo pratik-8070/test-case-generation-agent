@@ -1,0 +1,350 @@
+{
+  "metadata": {
+    "run_id": "2026-10-15-payment-method",
+    "created": "2026-10-15",
+    "notes": "Extracted requirements, ACs, and BRs from RFC-PAY-007 and integrated knowledge base source IDs (FR-1, FR-3, FR-8, FR-16, NFR-4, US-1, US-10, AC-01, AC-03, AC-05, BR-01)."
+  },
+  "inputs": [
+    {
+      "source": "output/2026-10-15-payment-method/attachments/confluence-1507329-RFC-Payment-Page-Multi-Method.md",
+      "input_type": "PRD",
+      "secondary_types": [
+        "TECHNICAL_SPEC",
+        "API_SPEC"
+      ],
+      "confidence": "high",
+      "evidence": [
+        "RFC: Payment Page (Multi-Method)",
+        "Status: IN REVIEW (DEMO)",
+        "POST /v1/payments/intents",
+        "interface PaymentMethodAdapter"
+      ]
+    }
+  ],
+  "features": [
+    {
+      "code": "PAYMENT",
+      "name": "Payment Method Orchestrator",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §2",
+      "description": "Single payment orchestrator supporting eight payment methods with isolated adapters, state machine, reconciliation, and gateway failover."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "FR-1",
+      "feature": "PAYMENT",
+      "text": "The system shall support eight payment methods (Cards, UPI, Net Banking, Wallets & Postpaid, E-Gift Vouchers, Pay Later, EMI, and Cash on Delivery) on web, Android, and iOS from one server-driven method list.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §2 G1",
+      "origin": "stated",
+      "user_role": "Buyer",
+      "details": {
+        "preconditions": [
+          "Checkout service has created a payment intent for an order"
+        ],
+        "expected_behavior": [
+          "Payment page renders server-driven list of allowed methods"
+        ]
+      }
+    },
+    {
+      "id": "FR-3",
+      "feature": "PAYMENT",
+      "text": "Every payment attempt shall be idempotent and reconciled daily against gateway settlement files without losing or double-charging a payment.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §2 G3",
+      "origin": "stated",
+      "user_role": "System / Finance",
+      "details": {
+        "expected_behavior": [
+          "Idempotency keys prevent duplicate charges",
+          "Daily reconciliation matches attempts against gateway settlement files"
+        ]
+      }
+    },
+    {
+      "id": "FR-8",
+      "feature": "PAYMENT",
+      "text": "The system shall route traffic around a failing gateway to a secondary gateway without requiring a release.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §2 G4",
+      "origin": "stated",
+      "user_role": "System",
+      "details": {
+        "expected_behavior": [
+          "Traffic shifts to secondary gateway when primary success rate drops 10 points below 24-hour average"
+        ]
+      }
+    },
+    {
+      "id": "FR-16",
+      "feature": "PAYMENT",
+      "text": "The system shall enforce payment method eligibility rules based on cart type, order amount, PIN code, and buyer history.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §3",
+      "origin": "stated",
+      "user_role": "Buyer",
+      "details": {
+        "preconditions": [
+          "Cart contains items with specific listing types (Buyer Protection, Luxury, Bulk, Standard)"
+        ]
+      }
+    },
+    {
+      "id": "REQ-PAY-005",
+      "feature": "PAYMENT",
+      "text": "The system shall maintain a payment intent lifecycle and a payment attempt state machine with terminal states Succeeded, Failed, COD confirmed, and Auto-refunded.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §5, §6",
+      "origin": "stated",
+      "user_role": "System",
+      "details": {
+        "expected_behavior": [
+          "Late successes after intent expiration trigger automatic refunds"
+        ]
+      }
+    },
+    {
+      "id": "REQ-PAY-006",
+      "feature": "PAYMENT",
+      "text": "The system shall provide method-specific initiation, callback handling, and status checking via isolated adapters.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §7",
+      "origin": "stated",
+      "user_role": "Buyer",
+      "details": {
+        "expected_behavior": [
+          "Cards use 3DS",
+          "UPI polls every 3s for up to 5 min",
+          "Gift vouchers support split tender up to 3 vouchers"
+        ]
+      }
+    },
+    {
+      "id": "REQ-PAY-007",
+      "feature": "PAYMENT",
+      "text": "The payment API shall provide endpoints for intent creation, intent retrieval, attempt initiation, attempt status checking, webhooks, and EMI plans with signature verification and idempotency enforcement.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §8",
+      "origin": "stated",
+      "user_role": "Client / Provider",
+      "details": {
+        "expected_behavior": [
+          "POST /v1/payments/intents requires valid order",
+          "Idempotency-Key within 24h returns original attempt"
+        ]
+      }
+    },
+    {
+      "id": "NFR-4",
+      "feature": "PAYMENT",
+      "text": "The system shall enforce security and compliance controls including PCI DSS scoping via gateway-hosted fields, network-tokenised saved cards, data localisation in India, and HMAC signature verification for webhooks.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §9",
+      "origin": "stated",
+      "user_role": "System / Security",
+      "details": {
+        "expected_behavior": [
+          "Card data never touches servers directly",
+          "PII and payment secrets masked or securely stored"
+        ]
+      }
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "requirement_id": "FR-1",
+      "text": "Payment page displays server-driven method list containing all applicable methods for the order.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §3",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-03",
+      "requirement_id": "FR-3",
+      "text": "Submitting an attempt with a duplicate Idempotency-Key within 24 hours returns the original attempt rather than creating a new charge.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §8",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-05",
+      "requirement_id": "FR-8",
+      "text": "Traffic automatically shifts from primary gateway to secondary gateway when success rate drops 10 points below the 24-hour average.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §10",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-FR16-1",
+      "requirement_id": "FR-16",
+      "text": "Buyer Protection and Luxury orders hide Cash on Delivery.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §3",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-PAY-004.2",
+      "requirement_id": "FR-16",
+      "text": "Bulk orders allow all prepaid methods and hide Cash on Delivery.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §3",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-PAY-004.3",
+      "requirement_id": "FR-16",
+      "text": "If a cart mixes types, the strictest rule wins (hiding COD for Luxury/Buyer Protection/Bulk).",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §3",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-PAY-004.4",
+      "requirement_id": "FR-16",
+      "text": "EMI requires order amount >= ₹3,000 and an eligible card and tenure.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §3",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-PAY-004.5",
+      "requirement_id": "FR-16",
+      "text": "Cash on Delivery is hidden for orders > ₹50,000, unserviceable PIN codes, or buyers with 2+ refused COD orders in 90 days.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §3, §7",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-PAY-005.1",
+      "requirement_id": "REQ-PAY-005",
+      "text": "Payment intent transitions through OPEN, PARTIALLY_PAID, PAID, COD_CONFIRMED, EXPIRED, CANCELLED states correctly.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §5",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-PAY-005.2",
+      "requirement_id": "REQ-PAY-005",
+      "text": "A late success received after intent expiration triggers an automatic refund.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §6",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-PAY-006.1",
+      "requirement_id": "REQ-PAY-006",
+      "text": "Cards adapter redirects to 3-D Secure page and supports tokenised saved cards.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §7",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-PAY-006.2",
+      "requirement_id": "REQ-PAY-006",
+      "text": "UPI adapter returns intent URI or QR code, polls every 3s for up to 5 min, and treats webhook as source of truth.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §7",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-PAY-006.3",
+      "requirement_id": "REQ-PAY-006",
+      "text": "Gift vouchers allow split tender with one other method and up to 3 vouchers per order.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §7",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-PAY-007.1",
+      "requirement_id": "REQ-PAY-007",
+      "text": "API endpoints return correct normalise error codes and messages (PAYMENT_DECLINED, AUTH_FAILED, INSUFFICIENT_FUNDS, METHOD_NOT_ELIGIBLE, PROVIDER_UNAVAILABLE, PAYMENT_TIMEOUT, INTENT_EXPIRED).",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §8",
+      "origin": "stated"
+    },
+    {
+      "id": "AC-PAY-008.1",
+      "requirement_id": "NFR-4",
+      "text": "Webhooks verify HMAC signatures, check IP allow-lists, and enforce a replay window of 5 minutes.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §9",
+      "origin": "stated"
+    }
+  ],
+  "business_rules": [
+    {
+      "id": "BR-01",
+      "requirement_id": "FR-16",
+      "text": "COD is blocked for Buyer Protection, Luxury, Bulk items, orders over ₹50,000, unserviceable PIN codes, and buyers with 2+ refused COD orders in the last 90 days.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §3, §7",
+      "origin": "stated"
+    },
+    {
+      "id": "BR-PAY-002",
+      "requirement_id": "FR-16",
+      "text": "EMI requires order amount of at least ₹3,000 and an eligible card/tenure combination.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §3, §7",
+      "origin": "stated"
+    },
+    {
+      "id": "BR-PAY-003",
+      "requirement_id": "REQ-PAY-005",
+      "text": "Payment intent expires exactly 30 minutes after creation if unpaid.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §5",
+      "origin": "stated"
+    },
+    {
+      "id": "BR-PAY-004",
+      "requirement_id": "REQ-PAY-006",
+      "text": "Split tender with Gift Voucher holds the voucher amount for 30 minutes; if the second attempt fails and intent expires, held voucher funds are released.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §5",
+      "origin": "stated"
+    },
+    {
+      "id": "BR-PAY-005",
+      "requirement_id": "REQ-PAY-007",
+      "text": "Webhook and redirect may arrive in any order; the first terminal status wins and later ones are logged only.",
+      "source_ref": "confluence-1507329-RFC-Payment-Page-Multi-Method.md §8",
+      "origin": "stated"
+    }
+  ],
+  "context": {
+    "user_roles": [
+      "Buyer",
+      "Finance",
+      "System Administrator",
+      "US-1",
+      "US-10"
+    ],
+    "preconditions": [
+      "Buyer has items in cart and proceeds to checkout",
+      "Payment intent is successfully created"
+    ],
+    "expected_behavior": [
+      "Server orchestrates payment across 8 methods with gateway routing and failover"
+    ]
+  },
+  "clarifications": [
+    {
+      "id": "Q-01",
+      "question": "Which specific gateways are primary and secondary for Cards, UPI, Net Banking, and EMI?",
+      "why": "Needed to test gateway routing and failover scenarios against exact gateway names.",
+      "severity": "non_blocking",
+      "related_refs": [
+        "FR-8"
+      ],
+      "status": "assumed",
+      "answer": "Assumed Gateway A is primary and Gateway B is secondary."
+    },
+    {
+      "id": "Q-02",
+      "question": "Is the ₹50,000 COD cap and ₹10,000 OTP threshold final across all product categories?",
+      "why": "Needed to verify exact boundary values for COD limits and OTP triggers.",
+      "severity": "non_blocking",
+      "related_refs": [
+        "AC-PAY-004.5",
+        "BR-01"
+      ],
+      "status": "assumed",
+      "answer": "Assumed ₹50,000 COD cap and ₹10,000 OTP threshold apply as stated in the demo values."
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A-01",
+      "text": "Gateway A is configured as the primary gateway and Gateway B as the secondary gateway for routing and failover tests.",
+      "related_refs": [
+        "FR-8"
+      ],
+      "from_clarification": "Q-01"
+    },
+    {
+      "id": "A-02",
+      "text": "The COD limit of ₹50,000 and OTP threshold of ₹10,000 are enforced strictly as documented.",
+      "related_refs": [
+        "AC-PAY-004.5",
+        "BR-01"
+      ],
+      "from_clarification": "Q-02"
+    }
+  ]
+}

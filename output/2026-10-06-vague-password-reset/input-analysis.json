@@ -1,0 +1,26 @@
+{
+  "metadata": {"run_id": "2026-10-06-vague-password-reset", "created": "2026-10-06"},
+  "inputs": [
+    {
+      "source": "resources/examples/vague-password-reset.txt",
+      "input_type": "PLAIN_TEXT",
+      "confidence": "high",
+      "evidence": ["Two informal sentences ('Users should be able to...') with no IDs, ACs or structure", "No story format, no 'shall' statements, no sections"]
+    }
+  ],
+  "features": [{"code": "PWRESET", "name": "Password Reset"}],
+  "requirements": [
+    {"id": "REQ-001", "feature": "PWRESET", "text": "A user who forgot their password can reset it", "source_ref": "sentence 1", "origin": "stated"},
+    {"id": "REQ-002", "feature": "PWRESET", "text": "The reset process is secure", "source_ref": "sentence 2", "origin": "stated"},
+    {"id": "REQ-003", "feature": "PWRESET", "text": "The new password must be strong", "source_ref": "sentence 2", "origin": "stated"}
+  ],
+  "acceptance_criteria": [],
+  "business_rules": [],
+  "clarifications": [
+    {"id": "Q-1", "question": "How does a user reset the password: emailed reset link, emailed one-time code, SMS code, or security questions?", "why": "The whole flow (steps and expected results) depends on the mechanism; nothing is stated.", "severity": "blocking", "related_refs": ["REQ-001"], "status": "open"},
+    {"id": "Q-2", "question": "What is the password policy for the new password (min/max length, required character classes, can it equal the previous password)?", "why": "'Strong' is not testable; boundary and validation cases need exact rules.", "severity": "blocking", "related_refs": ["REQ-003"], "status": "open"},
+    {"id": "Q-3", "question": "What does 'secure' require: link/code expiry time, single use, invalidation of older links, rate limiting of reset requests?", "why": "Each of these is a separate expected result; without values no security case can be verified.", "severity": "blocking", "related_refs": ["REQ-002"], "status": "open"},
+    {"id": "Q-4", "question": "What should happen when the reset is requested for an email that is not registered?", "why": "Determines whether a generic message (no account enumeration) or an error is expected.", "severity": "non_blocking", "related_refs": ["REQ-001", "REQ-002"], "status": "open"}
+  ],
+  "assumptions": []
+}

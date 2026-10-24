@@ -1,0 +1,635 @@
+{
+  "metadata": {
+    "suite_name": "Login (US-101)",
+    "created": "2026-10-06",
+    "input_types": [
+      "USER_STORY"
+    ],
+    "analysis_file": "input-analysis.json"
+  },
+  "test_cases": [
+    {
+      "id": "TC-LOGIN-001",
+      "source_refs": [
+        "AC1"
+      ],
+      "feature": "Login",
+      "scenario": "Log in with correct email and password for an active account",
+      "test_type": "Positive",
+      "priority": "Critical",
+      "preconditions": [
+        "Active account exists for asha@example.com with password Valid#Pass1",
+        "User is logged out and on the login page"
+      ],
+      "test_data": {
+        "email": "asha@example.com",
+        "password": "Valid#Pass1"
+      },
+      "steps": [
+        "Enter `email` from test data in the Email field",
+        "Enter `password` from test data in the Password field",
+        "Click 'Log in'"
+      ],
+      "expected_result": "User is redirected to the 'My Account' page and is logged in (reloading the page keeps them on 'My Account')",
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-002",
+      "source_refs": [
+        "AC2"
+      ],
+      "feature": "Login",
+      "scenario": "Log in with a registered email and a wrong password",
+      "test_type": "Negative",
+      "priority": "High",
+      "preconditions": [
+        "Active account exists for asha@example.com with password Valid#Pass1",
+        "User is on the login page"
+      ],
+      "test_data": {
+        "email": "asha@example.com",
+        "password": "Wrong#Pass9"
+      },
+      "steps": [
+        "Enter `email` from test data",
+        "Enter `password` from test data",
+        "Click 'Log in'"
+      ],
+      "expected_result": "Message 'Invalid email or password' is shown, the user remains on the login page and is not logged in",
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-003",
+      "source_refs": [
+        "AC2"
+      ],
+      "feature": "Login",
+      "scenario": "Log in with an email that is not registered",
+      "test_type": "Negative",
+      "priority": "High",
+      "preconditions": [
+        "No account exists for nobody@example.com",
+        "User is on the login page"
+      ],
+      "test_data": {
+        "email": "nobody@example.com",
+        "password": "Valid#Pass1"
+      },
+      "steps": [
+        "Enter `email` from test data",
+        "Enter `password` from test data",
+        "Click 'Log in'"
+      ],
+      "expected_result": "The same message 'Invalid email or password' is shown (no hint that the email is unknown) and the user remains on the login page",
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-004",
+      "source_refs": [
+        "AC3"
+      ],
+      "feature": "Login",
+      "scenario": "'Log in' button is disabled when both fields are empty",
+      "test_type": "UI",
+      "priority": "High",
+      "preconditions": [
+        "User opens the login page fresh (no autofill)"
+      ],
+      "test_data": {
+        "email": "",
+        "password": ""
+      },
+      "steps": [
+        "Leave Email and Password empty",
+        "Try to click 'Log in'"
+      ],
+      "expected_result": "'Log in' button is shown disabled and clicking it triggers no request and no navigation",
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-005",
+      "source_refs": [
+        "AC3"
+      ],
+      "feature": "Login",
+      "scenario": "'Log in' stays disabled when only one field is filled",
+      "test_type": "Validation",
+      "priority": "Medium",
+      "preconditions": [
+        "User is on the login page with both fields empty"
+      ],
+      "test_data": {
+        "case_a": {
+          "email": "asha@example.com",
+          "password": ""
+        },
+        "case_b": {
+          "email": "",
+          "password": "Valid#Pass1"
+        }
+      },
+      "steps": [
+        "Enter only the email from case_a",
+        "Observe the 'Log in' button",
+        "Clear the email and enter only the password from case_b",
+        "Observe the 'Log in' button"
+      ],
+      "expected_result": "In both case_a and case_b the 'Log in' button remains disabled",
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-006",
+      "source_refs": [
+        "AC3"
+      ],
+      "feature": "Login",
+      "scenario": "'Log in' enables once both fields are filled and disables again when one is cleared",
+      "test_type": "UI",
+      "priority": "Medium",
+      "preconditions": [
+        "User is on the login page with both fields empty"
+      ],
+      "test_data": {
+        "email": "asha@example.com",
+        "password": "Valid#Pass1"
+      },
+      "steps": [
+        "Enter `email` and `password` from test data",
+        "Observe the 'Log in' button",
+        "Clear the Password field",
+        "Observe the 'Log in' button"
+      ],
+      "expected_result": "The button becomes enabled after both fields are filled and becomes disabled again as soon as the password is cleared",
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-007",
+      "source_refs": [
+        "AC4"
+      ],
+      "feature": "Login",
+      "scenario": "Email without '@' shows the inline format message",
+      "test_type": "Validation",
+      "priority": "High",
+      "preconditions": [
+        "User is on the login page"
+      ],
+      "test_data": {
+        "email": "asha.example.com",
+        "password": "Valid#Pass1"
+      },
+      "steps": [
+        "Enter `email` from test data",
+        "Enter `password` from test data",
+        "Click 'Log in' (or move focus out of the Email field)"
+      ],
+      "expected_result": "Inline message 'Enter a valid email address' is shown under the Email field and the user is not logged in",
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-008",
+      "source_refs": [
+        "AC4"
+      ],
+      "feature": "Login",
+      "scenario": "Email with a missing domain part shows the inline format message",
+      "test_type": "Validation",
+      "priority": "Medium",
+      "preconditions": [
+        "User is on the login page"
+      ],
+      "test_data": {
+        "email": "asha@",
+        "password": "Valid#Pass1"
+      },
+      "steps": [
+        "Enter `email` from test data",
+        "Enter `password` from test data",
+        "Click 'Log in' (or move focus out of the Email field)"
+      ],
+      "expected_result": "Inline message 'Enter a valid email address' is shown under the Email field and the user is not logged in",
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-009",
+      "source_refs": [
+        "AC5"
+      ],
+      "feature": "Login",
+      "scenario": "Four consecutive failures do not lock the account",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Active account asha@example.com with 0 failed attempts"
+      ],
+      "test_data": {
+        "email": "asha@example.com",
+        "wrong_password": "Wrong#Pass9",
+        "correct_password": "Valid#Pass1",
+        "failed_attempts": 4
+      },
+      "steps": [
+        "Log in with `wrong_password` 4 times in a row",
+        "Log in with `correct_password`"
+      ],
+      "expected_result": "Each of the 4 failures shows 'Invalid email or password' (no lock message); the 5th attempt with the correct password redirects to 'My Account'",
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-010",
+      "source_refs": [
+        "AC5"
+      ],
+      "feature": "Login",
+      "scenario": "Fifth consecutive failure locks the account",
+      "test_type": "Boundary",
+      "priority": "Critical",
+      "preconditions": [
+        "Active account asha@example.com with 0 failed attempts"
+      ],
+      "test_data": {
+        "email": "asha@example.com",
+        "wrong_password": "Wrong#Pass9",
+        "failed_attempts": 5
+      },
+      "steps": [
+        "Log in with `wrong_password` 5 times in a row"
+      ],
+      "expected_result": "After the 5th attempt the message 'Your account is locked. Try again in 15 minutes.' is shown and the user is not logged in",
+      "postconditions": [
+        "Account asha@example.com is locked for 15 minutes"
+      ],
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-011",
+      "source_refs": [
+        "BR-003"
+      ],
+      "feature": "Login",
+      "scenario": "Correct password is rejected while the account is locked",
+      "test_type": "Business Rule",
+      "priority": "High",
+      "preconditions": [
+        "Account asha@example.com was locked by 5 failed attempts less than 1 minute ago"
+      ],
+      "test_data": {
+        "email": "asha@example.com",
+        "password": "Valid#Pass1"
+      },
+      "steps": [
+        "Enter `email` and the correct `password`",
+        "Click 'Log in'"
+      ],
+      "expected_result": "Message 'Your account is locked. Try again in 15 minutes.' is shown and the user is not redirected to 'My Account'",
+      "assumption": true,
+      "assumption_refs": [
+        "A-1"
+      ]
+    },
+    {
+      "id": "TC-LOGIN-012",
+      "source_refs": [
+        "AC5"
+      ],
+      "feature": "Login",
+      "scenario": "Account is still locked just before 15 minutes have passed",
+      "test_type": "Boundary",
+      "priority": "Medium",
+      "preconditions": [
+        "Account asha@example.com was locked exactly 14 minutes 50 seconds ago (use a controllable clock or adjust the lock timestamp in the test environment)"
+      ],
+      "test_data": {
+        "email": "asha@example.com",
+        "password": "Valid#Pass1",
+        "elapsed_since_lock": "14m50s"
+      },
+      "steps": [
+        "Enter `email` and the correct `password`",
+        "Click 'Log in'"
+      ],
+      "expected_result": "Message 'Your account is locked. Try again in 15 minutes.' is shown and the user is not logged in",
+      "assumption": true,
+      "assumption_refs": [
+        "A-1"
+      ]
+    },
+    {
+      "id": "TC-LOGIN-013",
+      "source_refs": [
+        "AC5"
+      ],
+      "feature": "Login",
+      "scenario": "Account unlocks after 15 minutes",
+      "test_type": "Boundary",
+      "priority": "High",
+      "preconditions": [
+        "Account asha@example.com was locked 15 minutes 10 seconds ago"
+      ],
+      "test_data": {
+        "email": "asha@example.com",
+        "password": "Valid#Pass1",
+        "elapsed_since_lock": "15m10s"
+      },
+      "steps": [
+        "Enter `email` and the correct `password`",
+        "Click 'Log in'"
+      ],
+      "expected_result": "User is redirected to the 'My Account' page",
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-014",
+      "source_refs": [
+        "BR-002"
+      ],
+      "feature": "Login",
+      "scenario": "Successful login resets the failed-attempt counter",
+      "test_type": "Business Rule",
+      "priority": "High",
+      "preconditions": [
+        "Active account asha@example.com with 0 failed attempts"
+      ],
+      "test_data": {
+        "email": "asha@example.com",
+        "wrong_password": "Wrong#Pass9",
+        "correct_password": "Valid#Pass1"
+      },
+      "steps": [
+        "Log in with `wrong_password` 4 times",
+        "Log in with `correct_password`",
+        "Log out",
+        "Log in with `wrong_password` 4 more times"
+      ],
+      "expected_result": "The last 4 failures each show 'Invalid email or password' and no lock message appears, proving the counter restarted from 0 after the successful login",
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-015",
+      "source_refs": [
+        "AC6"
+      ],
+      "feature": "Login",
+      "scenario": "Log in with the email in different letter case",
+      "test_type": "Positive",
+      "priority": "Medium",
+      "preconditions": [
+        "Active account registered as asha@example.com with password Valid#Pass1"
+      ],
+      "test_data": {
+        "email": "ASHA@Example.COM",
+        "password": "Valid#Pass1"
+      },
+      "steps": [
+        "Enter `email` from test data",
+        "Enter `password` from test data",
+        "Click 'Log in'"
+      ],
+      "expected_result": "User is redirected to the 'My Account' page of the asha@example.com account",
+      "assumption": false
+    },
+    {
+      "id": "TC-LOGIN-016",
+      "source_refs": [
+        "BR-001"
+      ],
+      "feature": "Login",
+      "scenario": "Log in with a password of the minimum length (8 characters)",
+      "test_type": "Boundary",
+      "priority": "Medium",
+      "preconditions": [
+        "Active account min8@example.com with an 8-character password"
+      ],
+      "test_data": {
+        "email": "min8@example.com",
+        "password": "Abcd#123"
+      },
+      "steps": [
+        "Enter `email` from test data",
+        "Enter the 8-character `password`",
+        "Click 'Log in'"
+      ],
+      "expected_result": "User is redirected to the 'My Account' page",
+      "assumption": true,
+      "assumption_refs": [
+        "A-2"
+      ]
+    },
+    {
+      "id": "TC-LOGIN-017",
+      "source_refs": [
+        "BR-001"
+      ],
+      "feature": "Login",
+      "scenario": "Log in with a password of the maximum length (64 characters)",
+      "test_type": "Boundary",
+      "priority": "Medium",
+      "preconditions": [
+        "Active account max64@example.com with a 64-character password"
+      ],
+      "test_data": {
+        "email": "max64@example.com",
+        "password": "64 characters: 'Aa1#' repeated 16 times"
+      },
+      "steps": [
+        "Enter `email` from test data",
+        "Paste the 64-character `password`",
+        "Click 'Log in'"
+      ],
+      "expected_result": "User is redirected to the 'My Account' page (the password is not truncated)",
+      "assumption": true,
+      "assumption_refs": [
+        "A-2"
+      ]
+    }
+  ],
+  "coverage_summary": {
+    "gaps": [
+      {
+        "description": "Behaviour for passwords shorter than 8 or longer than 64 characters at login is not specified",
+        "reason": "Assumption A-2; awaiting answer to Q-2"
+      },
+      {
+        "description": "Whether failures with an unregistered or badly formatted email count towards the lock",
+        "reason": "Not stated (Q-3)"
+      },
+      {
+        "description": "Password case sensitivity, session duration and 'remember me' are not specified",
+        "reason": "Not in US-101; not tested to avoid inventing requirements"
+      }
+    ],
+    "notes": "All 6 acceptance criteria and both stated business rules are covered, with boundaries on the 5-attempt lock and its 15-minute duration. Cases TC-LOGIN-011/012/016/017 rely on assumptions A-1 and A-2. The main remaining risks are the unspecified lock-counting rules (Q-3) and password-length handling at login (Q-2).",
+    "computed": {
+      "total_test_cases": 17,
+      "positive": 2,
+      "negative": 2,
+      "boundary": 6,
+      "edge": 0,
+      "validation": 3,
+      "by_type": {
+        "Boundary": 6,
+        "Business Rule": 2,
+        "Negative": 2,
+        "Positive": 2,
+        "UI": 2,
+        "Validation": 3
+      },
+      "by_priority": {
+        "Critical": 2,
+        "High": 8,
+        "Medium": 7
+      },
+      "assumption_based": 4,
+      "requirements_identified": 1,
+      "acceptance_criteria_identified": 6,
+      "business_rules_identified": 3,
+      "requirements_covered": 1,
+      "acceptance_criteria_covered": 6,
+      "business_rules_covered": 3,
+      "uncovered": {
+        "requirements": [],
+        "acceptance_criteria": [],
+        "business_rules": []
+      },
+      "requirements_without_negative": [],
+      "traceability": {
+        "requirements": [
+          {
+            "id": "US-101",
+            "text": "A registered customer can log in with email and password to access their account",
+            "test_cases": [
+              "TC-LOGIN-001",
+              "TC-LOGIN-002",
+              "TC-LOGIN-003",
+              "TC-LOGIN-004",
+              "TC-LOGIN-005",
+              "TC-LOGIN-006",
+              "TC-LOGIN-007",
+              "TC-LOGIN-008",
+              "TC-LOGIN-009",
+              "TC-LOGIN-010",
+              "TC-LOGIN-011",
+              "TC-LOGIN-012",
+              "TC-LOGIN-013",
+              "TC-LOGIN-014",
+              "TC-LOGIN-015",
+              "TC-LOGIN-016",
+              "TC-LOGIN-017"
+            ],
+            "test_types": [
+              "Boundary",
+              "Business Rule",
+              "Negative",
+              "Positive",
+              "UI",
+              "Validation"
+            ]
+          }
+        ],
+        "acceptance_criteria": [
+          {
+            "id": "AC1",
+            "text": "Correct email and password for an active account redirects to the 'My Account' page",
+            "test_cases": [
+              "TC-LOGIN-001"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "AC2",
+            "text": "Incorrect email or password shows 'Invalid email or password' and the customer remains on the login page",
+            "test_cases": [
+              "TC-LOGIN-002",
+              "TC-LOGIN-003"
+            ],
+            "test_types": [
+              "Negative"
+            ]
+          },
+          {
+            "id": "AC3",
+            "text": "'Log in' button is disabled until both email and password are non-empty",
+            "test_cases": [
+              "TC-LOGIN-004",
+              "TC-LOGIN-005",
+              "TC-LOGIN-006"
+            ],
+            "test_types": [
+              "UI",
+              "Validation"
+            ]
+          },
+          {
+            "id": "AC4",
+            "text": "Invalid email format shows inline 'Enter a valid email address' under the field",
+            "test_cases": [
+              "TC-LOGIN-007",
+              "TC-LOGIN-008"
+            ],
+            "test_types": [
+              "Validation"
+            ]
+          },
+          {
+            "id": "AC5",
+            "text": "After 5 consecutive failed attempts the account is locked for 15 minutes and 'Your account is locked. Try again in 15 minutes.' is shown",
+            "test_cases": [
+              "TC-LOGIN-009",
+              "TC-LOGIN-010",
+              "TC-LOGIN-012",
+              "TC-LOGIN-013"
+            ],
+            "test_types": [
+              "Boundary"
+            ]
+          },
+          {
+            "id": "AC6",
+            "text": "Email matching is case-insensitive",
+            "test_cases": [
+              "TC-LOGIN-015"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          }
+        ],
+        "business_rules": [
+          {
+            "id": "BR-001",
+            "text": "Password is 8-64 characters (existing registration rule)",
+            "test_cases": [
+              "TC-LOGIN-016",
+              "TC-LOGIN-017"
+            ],
+            "test_types": [
+              "Boundary"
+            ]
+          },
+          {
+            "id": "BR-002",
+            "text": "A successful login resets the failed-attempt counter",
+            "test_cases": [
+              "TC-LOGIN-014"
+            ],
+            "test_types": [
+              "Business Rule"
+            ]
+          },
+          {
+            "id": "BR-003",
+            "text": "While locked, a login with the correct password is also rejected with the lock message",
+            "test_cases": [
+              "TC-LOGIN-011"
+            ],
+            "test_types": [
+              "Business Rule"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

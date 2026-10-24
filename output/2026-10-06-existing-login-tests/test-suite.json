@@ -1,0 +1,412 @@
+{
+  "metadata": {
+    "suite_name": "Login & Logout — reviewed existing suite",
+    "created": "2026-10-06",
+    "input_types": [
+      "EXISTING_TEST_CASES"
+    ],
+    "analysis_file": "input-analysis.json"
+  },
+  "test_cases": [
+    {
+      "id": "TC-LOGIN-001",
+      "source_refs": [
+        "REQ-001"
+      ],
+      "feature": "Login",
+      "scenario": "Log in with a valid email and password",
+      "test_type": "Positive",
+      "priority": "High",
+      "preconditions": [
+        "Active account user@example.com exists with password Valid#Pass1",
+        "User is logged out and on the login page"
+      ],
+      "test_data": {
+        "email": "user@example.com",
+        "password": "Valid#Pass1"
+      },
+      "steps": [
+        "Enter `email` and `password` from test data",
+        "Click 'Log in'"
+      ],
+      "expected_result": "The user leaves the login page and the header shows the logged-in state (account name and a 'Logout' option)",
+      "assumption": true,
+      "assumption_refs": [
+        "A-1"
+      ],
+      "origin": "improved",
+      "original_id": "LG-01, LG-02",
+      "notes": "Merged duplicates LG-01 and LG-02; replaced 'logged in successfully' / 'works as expected' with observable outcomes."
+    },
+    {
+      "id": "TC-LOGIN-002",
+      "source_refs": [
+        "REQ-002"
+      ],
+      "feature": "Login",
+      "scenario": "Log in with a valid email and a wrong password",
+      "test_type": "Negative",
+      "priority": "High",
+      "preconditions": [
+        "Active account user@example.com exists with password Valid#Pass1",
+        "User is on the login page"
+      ],
+      "test_data": {
+        "email": "user@example.com",
+        "password": "Wrong#Pass9"
+      },
+      "steps": [
+        "Enter `email` and `password` from test data",
+        "Click 'Log in'"
+      ],
+      "expected_result": "An error message is displayed on the login page and the user remains on the login page and is not logged in (no logged-in header state)",
+      "assumption": true,
+      "assumption_refs": [
+        "A-1",
+        "A-2"
+      ],
+      "origin": "improved",
+      "original_id": "LG-03"
+    },
+    {
+      "id": "TC-LOGIN-003",
+      "source_refs": [
+        "REQ-003"
+      ],
+      "feature": "Login",
+      "scenario": "Submit the login form with both fields empty",
+      "test_type": "Validation",
+      "priority": "Medium",
+      "preconditions": [
+        "User is on the login page"
+      ],
+      "test_data": {
+        "email": "",
+        "password": ""
+      },
+      "steps": [
+        "Leave Email and Password empty",
+        "Click 'Log in'"
+      ],
+      "expected_result": "An error or required-field indication is shown for the empty fields and the user remains on the login page and is not logged in (no logged-in header state)",
+      "assumption": true,
+      "assumption_refs": [
+        "A-1",
+        "A-2"
+      ],
+      "origin": "improved",
+      "original_id": "LG-04"
+    },
+    {
+      "id": "TC-LOGIN-004",
+      "source_refs": [
+        "REQ-002"
+      ],
+      "feature": "Login",
+      "scenario": "Log in with an email that is not registered",
+      "test_type": "Negative",
+      "priority": "High",
+      "preconditions": [
+        "No account exists for nobody@example.com",
+        "User is on the login page"
+      ],
+      "test_data": {
+        "email": "nobody@example.com",
+        "password": "Valid#Pass1"
+      },
+      "steps": [
+        "Enter `email` and `password` from test data",
+        "Click 'Log in'"
+      ],
+      "expected_result": "An error message is displayed and the user remains on the login page and is not logged in (no logged-in header state)",
+      "assumption": true,
+      "assumption_refs": [
+        "A-1",
+        "A-2"
+      ],
+      "origin": "new"
+    },
+    {
+      "id": "TC-LOGIN-005",
+      "source_refs": [
+        "REQ-003"
+      ],
+      "feature": "Login",
+      "scenario": "Submit with email filled and password empty",
+      "test_type": "Validation",
+      "priority": "Medium",
+      "preconditions": [
+        "User is on the login page"
+      ],
+      "test_data": {
+        "email": "user@example.com",
+        "password": ""
+      },
+      "steps": [
+        "Enter only the email",
+        "Click 'Log in'"
+      ],
+      "expected_result": "An error or required-field indication is shown for the password field and the user remains on the login page and is not logged in (no logged-in header state)",
+      "assumption": true,
+      "assumption_refs": [
+        "A-1",
+        "A-2"
+      ],
+      "origin": "new"
+    },
+    {
+      "id": "TC-LOGIN-006",
+      "source_refs": [
+        "REQ-003"
+      ],
+      "feature": "Login",
+      "scenario": "Submit with password filled and email empty",
+      "test_type": "Validation",
+      "priority": "Medium",
+      "preconditions": [
+        "User is on the login page"
+      ],
+      "test_data": {
+        "email": "",
+        "password": "Valid#Pass1"
+      },
+      "steps": [
+        "Enter only the password",
+        "Click 'Log in'"
+      ],
+      "expected_result": "An error or required-field indication is shown for the email field and the user remains on the login page and is not logged in (no logged-in header state)",
+      "assumption": true,
+      "assumption_refs": [
+        "A-1",
+        "A-2"
+      ],
+      "origin": "new"
+    },
+    {
+      "id": "TC-LOGOUT-001",
+      "source_refs": [
+        "REQ-004"
+      ],
+      "feature": "Logout",
+      "scenario": "Log out from a logged-in session",
+      "test_type": "Positive",
+      "priority": "Medium",
+      "preconditions": [
+        "Active account user@example.com exists with password Valid#Pass1"
+      ],
+      "test_data": {
+        "email": "user@example.com",
+        "password": "Valid#Pass1"
+      },
+      "steps": [
+        "Log in with the test data credentials",
+        "Click Logout"
+      ],
+      "expected_result": "User is logged out and redirected to the homepage",
+      "assumption": true,
+      "assumption_refs": [
+        "A-1"
+      ],
+      "origin": "existing",
+      "original_id": "LG-06"
+    },
+    {
+      "id": "TC-LOGOUT-002",
+      "source_refs": [
+        "REQ-004"
+      ],
+      "feature": "Logout",
+      "scenario": "Back button after logout does not restore the logged-in session",
+      "test_type": "Session",
+      "priority": "Medium",
+      "preconditions": [
+        "Active account user@example.com exists with password Valid#Pass1",
+        "User is logged in and viewing their account page"
+      ],
+      "test_data": null,
+      "steps": [
+        "Click Logout",
+        "Press the browser Back button",
+        "Reload the page"
+      ],
+      "expected_result": "The account page is not shown in a logged-in state after reload; the header shows the logged-out state",
+      "assumption": true,
+      "assumption_refs": [
+        "A-1"
+      ],
+      "origin": "new",
+      "notes": "Common logout risk not covered by the original suite."
+    }
+  ],
+  "review_findings": [
+    {
+      "id": "RF-1",
+      "type": "duplicate",
+      "test_case_refs": [
+        "LG-01",
+        "LG-02",
+        "TC-LOGIN-001"
+      ],
+      "description": "LG-01 and LG-02 both test a valid login with the same steps.",
+      "action": "Merged into TC-LOGIN-001."
+    },
+    {
+      "id": "RF-2",
+      "type": "vague_expected_result",
+      "test_case_refs": [
+        "LG-01",
+        "LG-02",
+        "LG-03",
+        "LG-04"
+      ],
+      "description": "Expected results 'logged in successfully', 'Login works as expected', 'Error shown' and 'Error' cannot be verified.",
+      "action": "Rewritten with observable outcomes in TC-LOGIN-001..003."
+    },
+    {
+      "id": "RF-3",
+      "type": "weak_steps",
+      "test_case_refs": [
+        "LG-05"
+      ],
+      "description": "LG-05 'Test login' has the step 'Test the functionality' and expected result 'Works correctly'; it tests nothing identifiable.",
+      "action": "Removed; its intent is covered by TC-LOGIN-001."
+    },
+    {
+      "id": "RF-4",
+      "type": "missing_negative",
+      "test_case_refs": [
+        "TC-LOGIN-004"
+      ],
+      "description": "No case for an unregistered email.",
+      "action": "Added TC-LOGIN-004."
+    },
+    {
+      "id": "RF-5",
+      "type": "missing_validation",
+      "test_case_refs": [
+        "TC-LOGIN-005",
+        "TC-LOGIN-006"
+      ],
+      "description": "Empty-field validation only tested with both fields empty.",
+      "action": "Added TC-LOGIN-005 and TC-LOGIN-006."
+    },
+    {
+      "id": "RF-6",
+      "type": "missing_boundary",
+      "test_case_refs": [],
+      "description": "No boundary cases (password length, lockout attempts); the limits are not known from the tests.",
+      "action": "Not added; recorded as a coverage gap pending Q-2."
+    },
+    {
+      "id": "RF-7",
+      "type": "missing_coverage",
+      "test_case_refs": [
+        "TC-LOGOUT-002"
+      ],
+      "description": "Logout is only tested for the redirect, not session invalidation.",
+      "action": "Added TC-LOGOUT-002."
+    }
+  ],
+  "coverage_summary": {
+    "gaps": [
+      {
+        "description": "Boundary cases for password length and lockout",
+        "reason": "Rules unknown (Q-2)"
+      },
+      {
+        "description": "Email format validation, case sensitivity, session timeout",
+        "reason": "No requirement available (Q-1); not added to avoid inventing behaviour"
+      },
+      {
+        "ref": "REQ-001",
+        "description": "Negative login paths are tracked under REQ-002 and REQ-003",
+        "reason": "REQ-001 is the happy path only; its rejections are separate inferred requirements"
+      }
+    ],
+    "notes": "The original 6 cases reduce to 4 (1 kept, 3 improved; LG-02 merged and LG-05 removed), plus 4 new cases for unregistered email, single empty fields and post-logout session. All cases are assumption-based because requirements were reverse-engineered from the tests; supplying the login requirement (Q-1) and the password and lockout rules (Q-2) would enable boundary coverage.",
+    "computed": {
+      "total_test_cases": 8,
+      "positive": 2,
+      "negative": 2,
+      "boundary": 0,
+      "edge": 0,
+      "validation": 3,
+      "by_type": {
+        "Negative": 2,
+        "Positive": 2,
+        "Session": 1,
+        "Validation": 3
+      },
+      "by_priority": {
+        "High": 3,
+        "Medium": 5
+      },
+      "assumption_based": 8,
+      "requirements_identified": 4,
+      "acceptance_criteria_identified": 0,
+      "business_rules_identified": 0,
+      "requirements_covered": 4,
+      "acceptance_criteria_covered": 0,
+      "business_rules_covered": 0,
+      "uncovered": {
+        "requirements": [],
+        "acceptance_criteria": [],
+        "business_rules": []
+      },
+      "requirements_without_negative": [
+        "REQ-001"
+      ],
+      "traceability": {
+        "requirements": [
+          {
+            "id": "REQ-001",
+            "text": "A user can log in with a valid email and password",
+            "test_cases": [
+              "TC-LOGIN-001"
+            ],
+            "test_types": [
+              "Positive"
+            ]
+          },
+          {
+            "id": "REQ-002",
+            "text": "Login with invalid credentials is rejected with an error",
+            "test_cases": [
+              "TC-LOGIN-002",
+              "TC-LOGIN-004"
+            ],
+            "test_types": [
+              "Negative"
+            ]
+          },
+          {
+            "id": "REQ-003",
+            "text": "Login with empty fields is rejected with an error",
+            "test_cases": [
+              "TC-LOGIN-003",
+              "TC-LOGIN-005",
+              "TC-LOGIN-006"
+            ],
+            "test_types": [
+              "Validation"
+            ]
+          },
+          {
+            "id": "REQ-004",
+            "text": "A logged-in user can log out and is redirected to the homepage",
+            "test_cases": [
+              "TC-LOGOUT-001",
+              "TC-LOGOUT-002"
+            ],
+            "test_types": [
+              "Positive",
+              "Session"
+            ]
+          }
+        ],
+        "acceptance_criteria": [],
+        "business_rules": []
+      }
+    }
+  }
+}

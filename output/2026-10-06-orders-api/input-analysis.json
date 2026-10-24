@@ -1,0 +1,41 @@
+{
+  "metadata": {"run_id": "2026-10-06-orders-api", "created": "2026-10-06"},
+  "inputs": [
+    {
+      "source": "resources/examples/orders-api.yaml",
+      "input_type": "API_SPEC",
+      "confidence": "high",
+      "evidence": ["'openapi: 3.0.3' header with a 'paths:' block for /orders and /orders/{orderId}", "Request/response schemas, bearerAuth security scheme and status codes 200/201/400/401/404/409"]
+    }
+  ],
+  "features": [{"code": "ORDERS-API", "name": "Orders API", "source_ref": "orders-api.yaml info.title"}],
+  "requirements": [
+    {"id": "REQ-001", "feature": "ORDERS-API", "text": "POST /orders creates an order from the caller's cart items", "source_ref": "POST /orders", "origin": "stated",
+     "details": {"auth": ["bearerAuth required (global security)"], "inputs": ["items[] (1-20) of {productId uuid, quantity int 1-10}", "shippingAddressId uuid (required)", "couponCode ^[A-Z0-9]{6,12}$ (optional)"], "api_behavior": ["201 Order", "400 Error", "401", "409 Error (no order created)"]}},
+    {"id": "REQ-002", "feature": "ORDERS-API", "text": "GET /orders/{orderId} returns an order by id", "source_ref": "GET /orders/{orderId}", "origin": "stated",
+     "details": {"auth": ["bearerAuth required (global security)"], "inputs": ["orderId path, uuid, required"], "api_behavior": ["200 Order", "401", "404 not found or belongs to another customer"]}}
+  ],
+  "acceptance_criteria": [
+    {"id": "AC-001.1", "requirement_id": "REQ-001", "text": "Valid request returns 201 with an Order body", "source_ref": "POST /orders → 201", "origin": "stated"},
+    {"id": "AC-001.2", "requirement_id": "REQ-001", "text": "Invalid request returns 400 with an Error body (code, message, field)", "source_ref": "POST /orders → 400", "origin": "stated"},
+    {"id": "AC-001.3", "requirement_id": "REQ-001", "text": "Missing or invalid bearer token returns 401", "source_ref": "POST /orders → 401", "origin": "stated"},
+    {"id": "AC-001.4", "requirement_id": "REQ-001", "text": "Out-of-stock items return 409 with an Error body and no order is created", "source_ref": "POST /orders → 409", "origin": "stated"},
+    {"id": "AC-002.1", "requirement_id": "REQ-002", "text": "Existing own order returns 200 with the Order body", "source_ref": "GET /orders/{orderId} → 200", "origin": "stated"},
+    {"id": "AC-002.2", "requirement_id": "REQ-002", "text": "Missing or invalid bearer token returns 401", "source_ref": "GET /orders/{orderId} → 401", "origin": "stated"},
+    {"id": "AC-002.3", "requirement_id": "REQ-002", "text": "Unknown order, or an order of another customer, returns 404", "source_ref": "GET /orders/{orderId} → 404", "origin": "stated"}
+  ],
+  "business_rules": [
+    {"id": "BR-001", "requirement_id": "REQ-001", "text": "items and shippingAddressId are required", "source_ref": "POST /orders → CreateOrderRequest.required", "origin": "stated"},
+    {"id": "BR-002", "requirement_id": "REQ-001", "text": "items has 1 to 20 entries (minItems 1, maxItems 20)", "source_ref": "POST /orders → requestBody.items", "origin": "stated"},
+    {"id": "BR-003", "requirement_id": "REQ-001", "text": "Each item requires productId (uuid) and quantity (integer 1-10)", "source_ref": "POST /orders → requestBody.items[]", "origin": "stated"},
+    {"id": "BR-004", "requirement_id": "REQ-001", "text": "couponCode, when given, matches ^[A-Z0-9]{6,12}$", "source_ref": "POST /orders → requestBody.couponCode", "origin": "stated"},
+    {"id": "BR-005", "requirement_id": "REQ-001", "text": "On 201, stock is reserved for each item", "source_ref": "POST /orders → 201 description", "origin": "stated"},
+    {"id": "BR-006", "requirement_id": "REQ-001", "text": "shippingAddressId is a uuid", "source_ref": "POST /orders → requestBody.shippingAddressId", "origin": "stated"}
+  ],
+  "clarifications": [
+    {"id": "Q-1", "question": "What does GET /orders/{orderId} return for a non-uuid orderId (400 or 404)?", "why": "Only 200/401/404 are documented.", "severity": "non_blocking", "related_refs": ["REQ-002"], "status": "out_of_scope"},
+    {"id": "Q-2", "question": "What happens with a well-formed couponCode that does not exist or is expired, and how does a coupon change the total?", "why": "Only the pattern is documented.", "severity": "non_blocking", "related_refs": ["BR-004"], "status": "out_of_scope"},
+    {"id": "Q-3", "question": "What is returned for a shippingAddressId or productId that does not exist or belongs to another customer?", "why": "Not documented; could be 400, 404 or 409.", "severity": "non_blocking", "related_refs": ["BR-003", "BR-006"], "status": "out_of_scope"}
+  ],
+  "assumptions": []
+}

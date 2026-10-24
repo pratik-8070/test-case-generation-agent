@@ -1,0 +1,12 @@
+{
+  "example": "resources/examples/mini-prd.md",
+  "input_types": ["PRD"],
+  "min_features": 3,
+  "min_requirements": 12,
+  "test_case_range": [25, 70],
+  "required_source_ids": ["FR-2.1", "FR-2.2", "FR-2.3", "FR-2.4", "FR-3.1", "FR-3.2", "FR-3.3", "FR-3.4", "FR-4.1", "FR-4.2", "FR-4.3", "FR-4.4"],
+  "required_test_types": ["Positive", "Negative", "Boundary", "Business Rule"],
+  "must_mention": ["Your wishlist is full (50 items)", "This coupon has expired", "1000", "1001"],
+  "must_not_mention": ["share the wishlist", "share wishlist", "moderat"],
+  "expect_gap_keywords": ["load"]
+}

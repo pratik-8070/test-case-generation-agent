@@ -1,0 +1,51 @@
+Test Case ID,Source Refs,Feature,Scenario,Test Type,Priority,Preconditions,Test Data,Test Steps,Expected Result,Postconditions,Assumption,Assumption Refs,Origin,Notes
+TC-LOGIN-001,AC1,Login,Log in with correct email and password for an active account,Positive,Critical,"Active account exists for asha@example.com with password Valid#Pass1
+User is logged out and on the login page",email: asha@example.com; password: Valid#Pass1,"1. Enter `email` from test data in the Email field
+2. Enter `password` from test data in the Password field
+3. Click 'Log in'",User is redirected to the 'My Account' page and is logged in (reloading the page keeps them on 'My Account'),,No,,,
+TC-LOGIN-002,AC2,Login,Log in with a registered email and a wrong password,Negative,High,"Active account exists for asha@example.com with password Valid#Pass1
+User is on the login page",email: asha@example.com; password: Wrong#Pass9,"1. Enter `email` from test data
+2. Enter `password` from test data
+3. Click 'Log in'","Message 'Invalid email or password' is shown, the user remains on the login page and is not logged in",,No,,,
+TC-LOGIN-003,AC2,Login,Log in with an email that is not registered,Negative,High,"No account exists for nobody@example.com
+User is on the login page",email: nobody@example.com; password: Valid#Pass1,"1. Enter `email` from test data
+2. Enter `password` from test data
+3. Click 'Log in'",The same message 'Invalid email or password' is shown (no hint that the email is unknown) and the user remains on the login page,,No,,,
+TC-LOGIN-004,AC3,Login,'Log in' button is disabled when both fields are empty,UI,High,User opens the login page fresh (no autofill),email: ; password: ,"1. Leave Email and Password empty
+2. Try to click 'Log in'",'Log in' button is shown disabled and clicking it triggers no request and no navigation,,No,,,
+TC-LOGIN-005,AC3,Login,'Log in' stays disabled when only one field is filled,Validation,Medium,User is on the login page with both fields empty,case_a: email: asha@example.com; password: ; case_b: email: ; password: Valid#Pass1,"1. Enter only the email from case_a
+2. Observe the 'Log in' button
+3. Clear the email and enter only the password from case_b
+4. Observe the 'Log in' button",In both case_a and case_b the 'Log in' button remains disabled,,No,,,
+TC-LOGIN-006,AC3,Login,'Log in' enables once both fields are filled and disables again when one is cleared,UI,Medium,User is on the login page with both fields empty,email: asha@example.com; password: Valid#Pass1,"1. Enter `email` and `password` from test data
+2. Observe the 'Log in' button
+3. Clear the Password field
+4. Observe the 'Log in' button",The button becomes enabled after both fields are filled and becomes disabled again as soon as the password is cleared,,No,,,
+TC-LOGIN-007,AC4,Login,Email without '@' shows the inline format message,Validation,High,User is on the login page,email: asha.example.com; password: Valid#Pass1,"1. Enter `email` from test data
+2. Enter `password` from test data
+3. Click 'Log in' (or move focus out of the Email field)",Inline message 'Enter a valid email address' is shown under the Email field and the user is not logged in,,No,,,
+TC-LOGIN-008,AC4,Login,Email with a missing domain part shows the inline format message,Validation,Medium,User is on the login page,email: asha@; password: Valid#Pass1,"1. Enter `email` from test data
+2. Enter `password` from test data
+3. Click 'Log in' (or move focus out of the Email field)",Inline message 'Enter a valid email address' is shown under the Email field and the user is not logged in,,No,,,
+TC-LOGIN-009,AC5,Login,Four consecutive failures do not lock the account,Boundary,High,Active account asha@example.com with 0 failed attempts,email: asha@example.com; wrong_password: Wrong#Pass9; correct_password: Valid#Pass1; failed_attempts: 4,"1. Log in with `wrong_password` 4 times in a row
+2. Log in with `correct_password`",Each of the 4 failures shows 'Invalid email or password' (no lock message); the 5th attempt with the correct password redirects to 'My Account',,No,,,
+TC-LOGIN-010,AC5,Login,Fifth consecutive failure locks the account,Boundary,Critical,Active account asha@example.com with 0 failed attempts,email: asha@example.com; wrong_password: Wrong#Pass9; failed_attempts: 5,1. Log in with `wrong_password` 5 times in a row,After the 5th attempt the message 'Your account is locked. Try again in 15 minutes.' is shown and the user is not logged in,Account asha@example.com is locked for 15 minutes,No,,,
+TC-LOGIN-011,BR-003,Login,Correct password is rejected while the account is locked,Business Rule,High,Account asha@example.com was locked by 5 failed attempts less than 1 minute ago,email: asha@example.com; password: Valid#Pass1,"1. Enter `email` and the correct `password`
+2. Click 'Log in'",Message 'Your account is locked. Try again in 15 minutes.' is shown and the user is not redirected to 'My Account',,Yes,A-1,,
+TC-LOGIN-012,AC5,Login,Account is still locked just before 15 minutes have passed,Boundary,Medium,Account asha@example.com was locked exactly 14 minutes 50 seconds ago (use a controllable clock or adjust the lock timestamp in the test environment),email: asha@example.com; password: Valid#Pass1; elapsed_since_lock: 14m50s,"1. Enter `email` and the correct `password`
+2. Click 'Log in'",Message 'Your account is locked. Try again in 15 minutes.' is shown and the user is not logged in,,Yes,A-1,,
+TC-LOGIN-013,AC5,Login,Account unlocks after 15 minutes,Boundary,High,Account asha@example.com was locked 15 minutes 10 seconds ago,email: asha@example.com; password: Valid#Pass1; elapsed_since_lock: 15m10s,"1. Enter `email` and the correct `password`
+2. Click 'Log in'",User is redirected to the 'My Account' page,,No,,,
+TC-LOGIN-014,BR-002,Login,Successful login resets the failed-attempt counter,Business Rule,High,Active account asha@example.com with 0 failed attempts,email: asha@example.com; wrong_password: Wrong#Pass9; correct_password: Valid#Pass1,"1. Log in with `wrong_password` 4 times
+2. Log in with `correct_password`
+3. Log out
+4. Log in with `wrong_password` 4 more times","The last 4 failures each show 'Invalid email or password' and no lock message appears, proving the counter restarted from 0 after the successful login",,No,,,
+TC-LOGIN-015,AC6,Login,Log in with the email in different letter case,Positive,Medium,Active account registered as asha@example.com with password Valid#Pass1,email: ASHA@Example.COM; password: Valid#Pass1,"1. Enter `email` from test data
+2. Enter `password` from test data
+3. Click 'Log in'",User is redirected to the 'My Account' page of the asha@example.com account,,No,,,
+TC-LOGIN-016,BR-001,Login,Log in with a password of the minimum length (8 characters),Boundary,Medium,Active account min8@example.com with an 8-character password,email: min8@example.com; password: Abcd#123,"1. Enter `email` from test data
+2. Enter the 8-character `password`
+3. Click 'Log in'",User is redirected to the 'My Account' page,,Yes,A-2,,
+TC-LOGIN-017,BR-001,Login,Log in with a password of the maximum length (64 characters),Boundary,Medium,Active account max64@example.com with a 64-character password,email: max64@example.com; password: 64 characters: 'Aa1#' repeated 16 times,"1. Enter `email` from test data
+2. Paste the 64-character `password`
+3. Click 'Log in'",User is redirected to the 'My Account' page (the password is not truncated),,Yes,A-2,,

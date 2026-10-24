@@ -1,0 +1,10 @@
+{
+  "example": "resources/examples/login.md",
+  "input_types": ["USER_STORY"],
+  "min_requirements": 1,
+  "test_case_range": [10, 30],
+  "required_source_ids": ["US-101", "AC1", "AC2", "AC3", "AC4", "AC5", "AC6"],
+  "required_test_types": ["Positive", "Negative", "Boundary", "Validation"],
+  "must_mention": ["Invalid email or password", "Enter a valid email address", "15 minutes", "Your account is locked"],
+  "must_not_mention": ["remember me", "captcha", "two-factor"]
+}

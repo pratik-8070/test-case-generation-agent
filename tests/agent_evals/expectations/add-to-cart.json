@@ -1,0 +1,10 @@
+{
+  "example": "resources/examples/add-to-cart.md",
+  "input_types": ["ACCEPTANCE_CRITERIA"],
+  "min_requirements": 1,
+  "test_case_range": [10, 30],
+  "required_source_ids": ["AC-CART-1", "AC-CART-2", "AC-CART-3", "AC-CART-4", "AC-CART-5", "AC-CART-6"],
+  "required_test_types": ["Positive", "Boundary", "Validation"],
+  "must_mention": ["Added to cart", "You can buy a maximum of 10 units of this item", "left in stock", "11"],
+  "must_not_mention": ["wishlist", "coupon"]
+}

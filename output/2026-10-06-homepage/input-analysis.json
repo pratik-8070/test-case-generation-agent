@@ -1,0 +1,51 @@
+{
+  "metadata": {"run_id": "2026-10-06-homepage", "created": "2026-10-06"},
+  "inputs": [
+    {
+      "source": "resources/examples/homepage.md",
+      "input_type": "FEATURE_DESCRIPTION",
+      "confidence": "high",
+      "evidence": ["Narrative prose describing one page ('The homepage is the landing page...')", "No story format, requirement IDs or acceptance-criteria list", "Describes layout and behaviour of header, carousel, product grid, search and footer"]
+    }
+  ],
+  "features": [{"code": "HOME", "name": "Homepage", "source_ref": "homepage.md"}],
+  "requirements": [
+    {"id": "REQ-001", "feature": "HOME", "text": "Homepage is served at '/' for guests and logged-in customers", "source_ref": "homepage.md para 1", "origin": "stated"},
+    {"id": "REQ-002", "feature": "HOME", "text": "Header shows the ShopEase logo, which always returns to the homepage", "source_ref": "homepage.md para 2", "origin": "stated"},
+    {"id": "REQ-003", "feature": "HOME", "text": "Header cart icon shows the number of items in the cart", "source_ref": "homepage.md para 2", "origin": "stated"},
+    {"id": "REQ-004", "feature": "HOME", "text": "Header shows 'Sign in' for guests and 'Hi, <first name>' for logged-in customers", "source_ref": "homepage.md para 2", "origin": "stated"},
+    {"id": "REQ-005", "feature": "HOME", "text": "Hero banner carousel shows promotional banners", "source_ref": "homepage.md para 3", "origin": "stated"},
+    {"id": "REQ-006", "feature": "HOME", "text": "Featured Products grid shows product cards", "source_ref": "homepage.md para 4", "origin": "stated"},
+    {"id": "REQ-007", "feature": "HOME", "text": "Search bar opens the results page", "source_ref": "homepage.md para 5", "origin": "stated"},
+    {"id": "REQ-008", "feature": "HOME", "text": "Footer contains About Us, Contact, Privacy Policy and Terms of Service links", "source_ref": "homepage.md para 6", "origin": "stated"},
+    {"id": "REQ-009", "feature": "HOME", "text": "Page is usable on mobile (<= 480px wide)", "source_ref": "homepage.md para 7", "origin": "stated"}
+  ],
+  "acceptance_criteria": [
+    {"id": "AC-005.1", "requirement_id": "REQ-005", "text": "Carousel auto-rotates every 6 seconds", "source_ref": "homepage.md para 3", "origin": "stated"},
+    {"id": "AC-005.2", "requirement_id": "REQ-005", "text": "Left/right arrows move between banners", "source_ref": "homepage.md para 3", "origin": "stated"},
+    {"id": "AC-005.3", "requirement_id": "REQ-005", "text": "Each banner links to its promotion page", "source_ref": "homepage.md para 3", "origin": "stated"},
+    {"id": "AC-006.1", "requirement_id": "REQ-006", "text": "Each product card shows image, name, price and an 'Add to cart' button", "source_ref": "homepage.md para 4", "origin": "stated"},
+    {"id": "AC-006.2", "requirement_id": "REQ-006", "text": "Out-of-stock products show an 'Out of stock' label instead of the 'Add to cart' button", "source_ref": "homepage.md para 4", "origin": "stated"},
+    {"id": "AC-007.1", "requirement_id": "REQ-007", "text": "Pressing Enter opens /search?q=<term>", "source_ref": "homepage.md para 5", "origin": "stated"},
+    {"id": "AC-007.2", "requirement_id": "REQ-007", "text": "Clicking the search icon opens /search?q=<term>", "source_ref": "homepage.md para 5", "origin": "stated"},
+    {"id": "AC-009.1", "requirement_id": "REQ-009", "text": "At <= 480px the featured grid shows 2 products per row; otherwise 4 per row", "source_ref": "homepage.md para 7", "origin": "stated"}
+  ],
+  "business_rules": [
+    {"id": "BR-001", "requirement_id": "REQ-005", "text": "The carousel shows at most 5 banners", "source_ref": "homepage.md para 3", "origin": "stated"},
+    {"id": "BR-002", "requirement_id": "REQ-005", "text": "If there are no active promotions the carousel is hidden", "source_ref": "homepage.md para 3", "origin": "stated"},
+    {"id": "BR-003", "requirement_id": "REQ-006", "text": "The Featured Products grid shows 8 products", "source_ref": "homepage.md para 4", "origin": "stated"},
+    {"id": "BR-004", "requirement_id": "REQ-007", "text": "Search requires at least 2 characters", "source_ref": "homepage.md para 5", "origin": "stated"}
+  ],
+  "context": {
+    "user_roles": ["Guest", "Logged-in customer"],
+    "ui_behavior": ["Header: logo, search bar, cart icon with count, Sign in / Hi, <first name>", "Hero carousel (<=5 banners, 6s rotation, arrows)", "Featured grid of 8 cards, 4 per row desktop, 2 per row <=480px", "Footer with 4 links"]
+  },
+  "clarifications": [
+    {"id": "Q-1", "question": "What happens when a 1-character search is submitted: nothing, an inline message, or a disabled search icon?", "why": "BR-004 states the minimum but not the rejection behaviour.", "severity": "non_blocking", "related_refs": ["BR-004"], "status": "assumed"},
+    {"id": "Q-2", "question": "With more than 5 active promotions, which 5 banners are shown?", "why": "Selection/ordering rule is not stated.", "severity": "non_blocking", "related_refs": ["BR-001"], "status": "out_of_scope"},
+    {"id": "Q-3", "question": "What does the grid show when fewer than 8 products are featured?", "why": "BR-003 only states the normal case.", "severity": "non_blocking", "related_refs": ["BR-003"], "status": "out_of_scope"}
+  ],
+  "assumptions": [
+    {"id": "A-1", "text": "A search with fewer than 2 characters is not submitted: the URL does not change to /search and the user stays on the homepage.", "related_refs": ["BR-004"], "from_clarification": "Q-1"}
+  ]
+}

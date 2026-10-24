@@ -1,0 +1,108 @@
+{
+  "metadata": {
+    "run_id": "2026-10-06-existing-login-tests",
+    "created": "2026-10-06",
+    "notes": "Only test cases were supplied; requirements are reverse-engineered from them."
+  },
+  "inputs": [
+    {
+      "source": "resources/examples/existing-login-tests.csv",
+      "input_type": "EXISTING_TEST_CASES",
+      "confidence": "high",
+      "evidence": [
+        "CSV header 'Test ID,Title,Steps,Expected Result,Priority'",
+        "Six rows LG-01..LG-06 in test case format"
+      ]
+    }
+  ],
+  "features": [
+    {
+      "code": "LOGIN",
+      "name": "Login"
+    },
+    {
+      "code": "LOGOUT",
+      "name": "Logout"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "feature": "LOGIN",
+      "text": "A user can log in with a valid email and password",
+      "source_ref": "existing-login-tests.csv LG-01, LG-02",
+      "origin": "inferred"
+    },
+    {
+      "id": "REQ-002",
+      "feature": "LOGIN",
+      "text": "Login with invalid credentials is rejected with an error",
+      "source_ref": "existing-login-tests.csv LG-03",
+      "origin": "inferred"
+    },
+    {
+      "id": "REQ-003",
+      "feature": "LOGIN",
+      "text": "Login with empty fields is rejected with an error",
+      "source_ref": "existing-login-tests.csv LG-04",
+      "origin": "inferred"
+    },
+    {
+      "id": "REQ-004",
+      "feature": "LOGOUT",
+      "text": "A logged-in user can log out and is redirected to the homepage",
+      "source_ref": "existing-login-tests.csv LG-06",
+      "origin": "inferred"
+    }
+  ],
+  "acceptance_criteria": [],
+  "business_rules": [],
+  "clarifications": [
+    {
+      "id": "Q-1",
+      "question": "Is there a requirement or story for login/logout that these tests should be checked against?",
+      "why": "Without it, requirements can only be inferred from the tests.",
+      "severity": "non_blocking",
+      "related_refs": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "status": "assumed"
+    },
+    {
+      "id": "Q-2",
+      "question": "What are the exact error messages, password rules and lockout rules?",
+      "why": "Needed for specific expected results and boundary cases.",
+      "severity": "non_blocking",
+      "related_refs": [
+        "REQ-002",
+        "REQ-003"
+      ],
+      "status": "assumed"
+    }
+  ],
+  "assumptions": [
+    {
+      "id": "A-1",
+      "text": "The behaviour implied by the existing tests (LG-01..LG-06) is the intended behaviour.",
+      "related_refs": [
+        "REQ-001",
+        "REQ-002",
+        "REQ-003",
+        "REQ-004"
+      ],
+      "from_clarification": "Q-1"
+    },
+    {
+      "id": "A-2",
+      "text": "Exact message texts and validation/lockout rules are unknown; expected results assert the observable outcome without inventing message text.",
+      "related_refs": [
+        "REQ-002",
+        "REQ-003"
+      ],
+      "from_clarification": "Q-2"
+    }
+  ]
+}
