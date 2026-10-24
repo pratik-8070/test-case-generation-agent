@@ -147,3 +147,7 @@ The examples in `resources/examples/` cover a login story, a homepage descriptio
 ## Status
 
 This is a working prototype, used with a Slack workspace, Confluence Cloud, Figma and Google Sheets. Planned extensions are listed in `CLAUDE.md`, under "Future Extensions": Jira and test-management integration, an RTM export, and Playwright or Selenium generation.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
